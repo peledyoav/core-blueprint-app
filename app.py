@@ -12,6 +12,7 @@ from core.database import (init_db, add_client, update_client, delete_client, re
                            get_all_clients, get_client_by_id, get_questionnaire, get_report, save_report)
 from core.analyzer import analyze_client
 from core.charts import create_spider_chart, create_energy_bars
+from core.pdf_generator import generate_client_pdf
 from data.core_blueprint import TRACKS
 
 st.set_page_config(
@@ -215,14 +216,26 @@ def show_client_report(client_id: int):
 
     st.title(f"📊 דוח — {client['name']}")
 
-    col1, col2, col3 = st.columns([1, 2, 1])
+    col1, col2, col3, col4 = st.columns([1, 2, 1, 1])
     with col1:
         st.metric("מסלול מומלץ", track["name_he"])
     with col2:
         if report.get("track_reason_he"):
             st.info(report["track_reason_he"])
     with col3:
-        if st.button("🔄 צור דוח מחדש", key=f"regen_{client_id}"):
+        try:
+            pdf_bytes = generate_client_pdf(report, client["name"])
+            st.download_button(
+                label="📄 הורד דוח PDF",
+                data=pdf_bytes,
+                file_name=f"CORE_Blueprint_{client['name']}.pdf",
+                mime="application/pdf",
+                use_container_width=True,
+            )
+        except Exception as e:
+            st.caption(f"PDF: {e}")
+    with col4:
+        if st.button("🔄 צור דוח מחדש", key=f"regen_{client_id}", use_container_width=True):
             with st.spinner("מנתח מחדש..."):
                 q = get_questionnaire(client_id)
                 rep = analyze_client(q, client)

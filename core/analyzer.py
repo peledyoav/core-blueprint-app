@@ -229,6 +229,44 @@ Produce the following JSON (respond with ONLY valid JSON, no markdown):
     ]
   }},
 
+  "recommended_roles": [
+    {{
+      "title_he": "Job title in Hebrew (e.g. מנהל מוצר, ארכיטקט פתרונות)",
+      "timeframe": "short",
+      "reasoning_he": "2-3 sentences: why specifically THIS person should pursue this role based on their profile, skills, and market data",
+      "salary_range_ils": "e.g. 30,000-45,000",
+      "description_he": "1-2 sentences what this role involves in Israeli market"
+    }},
+    {{
+      "title_he": "Role 2",
+      "timeframe": "short",
+      "reasoning_he": "...",
+      "salary_range_ils": "...",
+      "description_he": "..."
+    }},
+    {{
+      "title_he": "Role 3",
+      "timeframe": "short",
+      "reasoning_he": "...",
+      "salary_range_ils": "...",
+      "description_he": "..."
+    }},
+    {{
+      "title_he": "Role 4 - longer horizon",
+      "timeframe": "long",
+      "reasoning_he": "...",
+      "salary_range_ils": "...",
+      "description_he": "..."
+    }},
+    {{
+      "title_he": "Role 5 - longer horizon",
+      "timeframe": "long",
+      "reasoning_he": "...",
+      "salary_range_ils": "...",
+      "description_he": "..."
+    }}
+  ],
+
   "cv_analysis": "3-4 sentences CV analysis in Hebrew. If no CV: 'לא צורף קורות חיים'",
   "cv_milestones": ["Key milestone from CV 1", "Milestone 2", "Milestone 3"],
 
@@ -281,6 +319,7 @@ Produce the following JSON (respond with ONLY valid JSON, no markdown):
         "market_analysis_he": analysis.get("market_analysis_he", ""),
         "insights": analysis.get("insights_he", []),
         "recommended_directions": analysis.get("recommended_directions", []),
+        "recommended_roles": analysis.get("recommended_roles", []),
         "quick_wins": analysis.get("quick_wins_he", []),
         "networking": analysis.get("networking_he", {}),
         "resources": analysis.get("resources", {}),
