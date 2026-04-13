@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent))
 
-from core.database import init_db, add_client, get_all_clients, get_client_by_id, get_questionnaire, get_report
+from core.database import init_db, add_client, get_all_clients, get_client_by_id, get_questionnaire, get_report, save_report
+from core.analyzer import analyze_client
 from core.charts import create_spider_chart, create_energy_bars
 from data.core_blueprint import TRACKS
 
@@ -104,6 +105,15 @@ def page_clients():
                 if has_report:
                     if st.button("צפה בדוח", key=f"view_{client['id']}", type="primary"):
                         st.session_state.view_client_id = client["id"]
+                        st.rerun()
+                elif has_questionnaire:
+                    if st.button("צור דוח", key=f"gen_{client['id']}", type="secondary"):
+                        with st.spinner("מנתח נתונים..."):
+                            q = get_questionnaire(client["id"])
+                            c = get_client_by_id(client["id"])
+                            report = analyze_client(q, c)
+                            save_report(client["id"], q["id"], report)
+                        st.success("הדוח נוצר!")
                         st.rerun()
 
     if "view_client_id" in st.session_state:
