@@ -1,5 +1,6 @@
 import os
 import json
+import time
 import requests
 from datetime import date
 from data.core_blueprint import TRACKS
@@ -16,7 +17,7 @@ def _get_api_key():
     return key
 
 
-def _call_llm(prompt: str, max_tokens: int = 8000) -> str:
+def _call_llm(prompt: str, max_tokens: int = 7000) -> str:
     api_key = _get_api_key()
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
@@ -29,20 +30,31 @@ def _call_llm(prompt: str, max_tokens: int = 8000) -> str:
         "max_tokens": max_tokens,
         "temperature": 0.7
     }
-    resp = requests.post(url, headers=headers, json=payload, timeout=180)
-    if not resp.ok:
+    for attempt in range(3):
+        resp = requests.post(url, headers=headers, json=payload, timeout=180)
+        if resp.ok:
+            return resp.json()["choices"][0]["message"]["content"]
+        # Rate limit — wait and retry
+        if resp.status_code == 429:
+            try:
+                wait = float(resp.json()["error"]["message"].split("try again in ")[1].split("s")[0])
+            except Exception:
+                wait = 60
+            wait = min(wait + 2, 65)  # small buffer, cap at 65s
+            try:
+                import streamlit as st
+                st.info(f"מגבלת קצב Groq — ממתין {int(wait)} שניות ומנסה שוב...")
+            except Exception:
+                pass
+            time.sleep(wait)
+            continue
+        # Other error
         try:
-            err = resp.json()
-            msg = err.get("error", {}).get("message", resp.text[:300])
+            msg = resp.json().get("error", {}).get("message", resp.text[:300])
         except Exception:
             msg = resp.text[:300]
-        try:
-            import streamlit as st
-            st.error(f"LLM error {resp.status_code}: {msg}")
-        except Exception:
-            pass
-        raise Exception(f"LLM error {resp.status_code}")
-    return resp.json()["choices"][0]["message"]["content"]
+        raise Exception(f"LLM error {resp.status_code}: {msg}")
+    raise Exception("LLM rate limit: נסה שוב בעוד דקה")
 
 
 SYSTEM_PROMPT = """You are Israel's top career advisor for high-tech professionals, combining deep expertise in:
