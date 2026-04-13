@@ -22,6 +22,52 @@ st.set_page_config(
 
 init_db()
 
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;600;700;900&display=swap');
+
+html, body, [class*="css"] { font-family: 'Heebo', sans-serif; }
+
+.stApp, .stApp * { direction: rtl; text-align: right; }
+.stSlider, .stSlider * { direction: ltr !important; text-align: left !important; }
+
+/* Sidebar RTL */
+[data-testid="stSidebar"] { direction: rtl; }
+[data-testid="stSidebar"] * { direction: rtl; text-align: right; }
+
+/* Tabs RTL */
+[data-testid="stTabs"] { direction: rtl; }
+button[data-baseweb="tab"] { font-family: 'Heebo', sans-serif !important; font-weight: 600; }
+
+/* Metrics */
+[data-testid="stMetric"] { direction: rtl; text-align: right; }
+
+/* Expander */
+[data-testid="stExpander"] { direction: rtl; }
+
+/* Buttons */
+.stButton > button {
+    background-color: #52c4cd !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 22px !important;
+    font-weight: 700 !important;
+    font-family: 'Heebo', sans-serif !important;
+}
+.stButton > button:hover { background-color: #0a203d !important; }
+
+/* Headers and text */
+h1, h2, h3, h4 { color: #0a203d; font-family: 'Heebo', sans-serif !important; }
+
+/* Background */
+.stApp { background-color: #f2f2f2; }
+
+/* Cards */
+[data-testid="stExpander"] { background: white; border-radius: 12px; }
+</style>
+""", unsafe_allow_html=True)
+
+
 def _get_secret(key, default=""):
     try:
         return st.secrets.get(key) or os.getenv(key, default)
