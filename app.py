@@ -21,8 +21,14 @@ st.set_page_config(
 
 init_db()
 
-MENTOR_PASSWORD = os.getenv("MENTOR_PASSWORD", "core2024")
-BASE_URL = os.getenv("BASE_URL", "http://localhost:8501")
+def _get_secret(key, default=""):
+    try:
+        return st.secrets.get(key) or os.getenv(key, default)
+    except Exception:
+        return os.getenv(key, default)
+
+MENTOR_PASSWORD = _get_secret("MENTOR_PASSWORD", "core2024")
+BASE_URL = _get_secret("BASE_URL", "http://localhost:8501")
 
 PHASE_COLORS = {
     "Audit": "#EF553B",
