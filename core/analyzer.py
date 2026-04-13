@@ -278,25 +278,51 @@ Produce the following JSON (respond with ONLY valid JSON, no markdown):
   "cv_milestones": ["Key milestone from CV 1", "Milestone 2", "Milestone 3"],
 
   "personalized_syllabus": [
-    {{
-      "session": 1,
-      "personalized_focus_he": "What specifically to focus on in session 1 FOR THIS CLIENT",
-      "key_questions_he": ["Question tailored to their data", "Question 2", "Question 3"],
-      "homework_adaptation_he": "Specific homework adaptation for this client"
-    }}
+    {{"session": 1, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2","Q3"], "homework_adaptation_he": "..."}},
+    {{"session": 2, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 3, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 4, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 5, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 6, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 7, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 8, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 9, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}},
+    {{"session": 10, "personalized_focus_he": "...", "key_questions_he": ["Q1","Q2"], "homework_adaptation_he": "..."}}
   ]
 }}"""
 
-    raw = _call_llm(prompt, max_tokens=8000).strip()
+    def _extract_json(text: str) -> dict:
+        """Try multiple strategies to extract valid JSON from LLM output."""
+        text = text.strip()
+        # Strip markdown code fences
+        if "```json" in text:
+            text = text.split("```json")[1].split("```")[0].strip()
+        elif "```" in text:
+            text = text.split("```")[1].split("```")[0].strip()
+        # Find outermost { ... }
+        start = text.find("{")
+        end = text.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            text = text[start:end + 1]
+        return json.loads(text)
 
-    # Clean JSON
-    if "```json" in raw:
-        raw = raw.split("```json")[1].split("```")[0]
-    elif "```" in raw:
-        raw = raw.split("```")[1].split("```")[0]
-    raw = raw.strip()
-
-    analysis = json.loads(raw)
+    # Try up to 2 times in case LLM returns malformed JSON
+    raw = None
+    last_err = None
+    for attempt in range(2):
+        try:
+            raw = _call_llm(prompt, max_tokens=16000).strip()
+            analysis = _extract_json(raw)
+            break
+        except (json.JSONDecodeError, ValueError) as e:
+            last_err = e
+            if attempt == 1:
+                try:
+                    import streamlit as st
+                    st.error(f"הניתוח החזיר פורמט לא תקין (ניסיון {attempt+1}/2). נסה שוב.")
+                except Exception:
+                    pass
+                raise Exception(f"LLM returned invalid JSON after 2 attempts: {e}") from e
 
     # Merge with CORE Blueprint syllabus template
     track_key = analysis.get("track", "A")
