@@ -20,7 +20,16 @@ def _call_gemini(prompt: str) -> str:
     }
     resp = requests.post(url, json=payload, timeout=120)
     if not resp.ok:
-        raise Exception(f"Gemini HTTP {resp.status_code}: {resp.text[:500]}")
+        try:
+            err = resp.json()
+            msg = err.get("error", {}).get("message", resp.text[:200])
+            code = err.get("error", {}).get("code", resp.status_code)
+        except Exception:
+            msg = "unknown"
+            code = resp.status_code
+        import streamlit as st
+        st.error(f"Gemini error {code}: {msg}")
+        raise Exception(f"Gemini error {code}")
     return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
 
 SYSTEM_PROMPT = """You are an expert career coach assistant specializing in high-tech professionals in Israel.
