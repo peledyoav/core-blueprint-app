@@ -4,11 +4,17 @@ import requests
 from data.core_blueprint import TRACKS
 
 def _get_api_key():
+    key = None
     try:
         import streamlit as st
-        return st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+        key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
     except Exception:
-        return os.getenv("GROQ_API_KEY")
+        key = os.getenv("GROQ_API_KEY")
+    if not key:
+        import streamlit as st
+        st.error("GROQ_API_KEY is missing from secrets!")
+        raise Exception("GROQ_API_KEY not set")
+    return key
 
 
 def _call_llm(prompt: str) -> str:
