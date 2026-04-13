@@ -9,7 +9,11 @@ from core.database import (init_db, get_client_by_token, save_questionnaire,
 from core.analyzer import analyze_client, extract_cv_text
 
 st.set_page_config(page_title="CORE Blueprint - שאלון", layout="centered", page_icon="🧭")
-init_db()
+try:
+    init_db()
+except Exception as _db_err:
+    st.error(f"שגיאת חיבור למסד נתונים: {_db_err}")
+    st.stop()
 
 # ── CSS ────────────────────────────────────────────────────────────────────────
 st.markdown("""

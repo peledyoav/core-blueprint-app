@@ -22,7 +22,11 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-init_db()
+try:
+    init_db()
+except Exception as _db_err:
+    st.error(f"שגיאת חיבור למסד נתונים: {_db_err}")
+    st.stop()
 
 st.markdown("""
 <style>

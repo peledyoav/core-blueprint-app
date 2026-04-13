@@ -4,15 +4,31 @@ import json
 import os
 
 def _get_db_url():
+    url = None
+    # Try st.secrets first (Streamlit Cloud)
     try:
         import streamlit as st
-        return st.secrets.get("DATABASE_URL") or os.getenv("DATABASE_URL")
+        # Try bracket access first, then .get()
+        try:
+            url = st.secrets["DATABASE_URL"]
+        except (KeyError, Exception):
+            url = st.secrets.get("DATABASE_URL")
     except Exception:
-        return os.getenv("DATABASE_URL")
+        pass
+    # Fallback to environment variable
+    if not url:
+        url = os.getenv("DATABASE_URL")
+    return url
 
 
 def get_connection():
-    conn = psycopg2.connect(_get_db_url())
+    url = _get_db_url()
+    if not url:
+        raise RuntimeError(
+            "DATABASE_URL is not configured. "
+            "Add it to Streamlit Cloud secrets or set the DATABASE_URL environment variable."
+        )
+    conn = psycopg2.connect(url)
     return conn
 
 
