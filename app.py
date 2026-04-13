@@ -195,9 +195,39 @@ def show_client_report(client_id: int):
             st.success("הדוח עודכן!")
             st.rerun()
 
-    tab1, tab2, tab3, tab4 = st.tabs(["📈 פרופיל", "🔍 תובנות", "🗺️ כיוונים", "📋 סילבוס"])
+    tabs = st.tabs(["📋 סיכום", "📈 פרופיל", "💪 SWOT", "🎯 כיוונים", "⚡ פעולות", "📚 משאבים", "🗺️ סילבוס"])
 
-    with tab1:
+    # ── TAB 1: Executive Summary ───────────────────────────────────────────────
+    with tabs[0]:
+        if report.get("executive_summary_he"):
+            st.info(report["executive_summary_he"])
+
+        cv_profile = report.get("cv_profile", {})
+        if cv_profile:
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                yrs = cv_profile.get("years_total_experience")
+                st.metric("שנות ניסיון", f"{yrs}" if yrs else "N/A")
+            with col2:
+                st.metric("שלב קריירה", cv_profile.get("career_stage_he", "N/A"))
+            with col3:
+                st.metric("מסלול מומלץ", track["name_he"])
+
+            if cv_profile.get("key_technical_skills"):
+                st.markdown("**כישורים טכניים מרכזיים:**")
+                skills_str = " • ".join(cv_profile["key_technical_skills"])
+                st.markdown(f"<p style='color:#52c4cd;font-weight:600'>{skills_str}</p>", unsafe_allow_html=True)
+
+            if cv_profile.get("market_positioning_he"):
+                st.markdown("**מיקום בשוק:**")
+                st.write(cv_profile["market_positioning_he"])
+
+        if report.get("market_analysis_he"):
+            st.markdown("**ניתוח שוק:**")
+            st.write(report["market_analysis_he"])
+
+    # ── TAB 2: Profile ─────────────────────────────────────────────────────────
+    with tabs[1]:
         col1, col2 = st.columns([3, 2])
         with col1:
             spider = report.get("spider_data", {})
@@ -210,68 +240,185 @@ def show_client_report(client_id: int):
                 fig2 = create_energy_bars(batteries)
                 st.plotly_chart(fig2, use_container_width=True)
 
-        if report.get("cv_analysis"):
+        cv_profile = report.get("cv_profile", {})
+        if report.get("cv_analysis") and report["cv_analysis"] != "לא צורף קורות חיים":
             st.subheader("ניתוח קורות חיים")
-            st.write(report.get("cv_analysis", ""))
+            st.write(report["cv_analysis"])
+            if cv_profile.get("career_trajectory_he"):
+                st.markdown(f"**מסלול קריירה:** {cv_profile['career_trajectory_he']}")
+            if cv_profile.get("personal_brand_he"):
+                st.markdown(f"**מיתוג אישי:** {cv_profile['personal_brand_he']}")
+            if cv_profile.get("brand_gaps_he"):
+                st.markdown(f"**מה חסר במיתוג:** {cv_profile['brand_gaps_he']}")
             milestones = report.get("cv_milestones", [])
             if milestones:
-                st.subheader("אבני דרך עיקריות")
+                st.markdown("**אבני דרך עיקריות:**")
                 for m in milestones:
                     st.markdown(f"• {m}")
 
-    with tab2:
-        st.subheader("תובנות מרכזיות")
         insights = report.get("insights", [])
-        if isinstance(insights, list):
+        if insights:
+            st.subheader("תובנות מרכזיות")
             for i, insight in enumerate(insights, 1):
-                st.markdown(f"**{i}.** {insight}")
-        else:
-            st.write(insights)
+                st.markdown(f"**{i}.** {insight}" if isinstance(insight, str) else f"**{i}.** {str(insight)}")
 
-    with tab3:
-        st.subheader("כיווני פיתוח מומלצים")
+    # ── TAB 3: SWOT ────────────────────────────────────────────────────────────
+    with tabs[2]:
+        swot = report.get("swot", {})
+        if swot:
+            col1, col2 = st.columns(2)
+            with col1:
+                st.markdown("### 💪 חוזקות")
+                for s in swot.get("strengths_he", []):
+                    st.markdown(f"✅ {s}")
+                st.markdown("### 🌱 הזדמנויות")
+                for s in swot.get("opportunities_he", []):
+                    st.markdown(f"🚀 {s}")
+            with col2:
+                st.markdown("### ⚠️ חולשות")
+                for s in swot.get("weaknesses_he", []):
+                    st.markdown(f"🔸 {s}")
+                st.markdown("### 🌩️ איומים")
+                for s in swot.get("threats_he", []):
+                    st.markdown(f"⚡ {s}")
+        else:
+            st.info("SWOT יהיה זמין בדוח הבא")
+
+    # ── TAB 4: Directions ──────────────────────────────────────────────────────
+    with tabs[3]:
         directions = report.get("recommended_directions", [])
         for d in directions:
-            with st.container(border=True):
-                col1, col2, col3 = st.columns([3, 1, 1])
+            title = d.get("title_he") or d.get("title", "")
+            desc = d.get("description_he") or d.get("description", "")
+            with st.expander(f"**{title}** — התאמה: {d.get('fit_score','?')}/10", expanded=True):
+                col1, col2, col3, col4 = st.columns(4)
                 with col1:
-                    st.markdown(f"### {d.get('title', '')}")
-                    st.write(d.get("description", ""))
+                    st.metric("התאמה", f"{d.get('fit_score','?')}/10")
                 with col2:
-                    st.metric("התאמה", f"{d.get('fit_score', 0)}/10")
-                with col3:
-                    demand = d.get("market_demand", "")
-                    demand_he = {"high": "גבוהה", "medium": "בינונית", "low": "נמוכה"}.get(demand, demand)
+                    demand = d.get("market_demand","")
+                    demand_he = {"high":"גבוהה","medium":"בינונית","low":"נמוכה"}.get(demand, demand)
                     st.metric("ביקוש שוק", demand_he)
-                st.caption(f"⏱️ {d.get('timeline', '')}")
+                with col3:
+                    st.metric("שכר צפוי (₪)", d.get("salary_range_ils","N/A"))
+                with col4:
+                    risk = d.get("risk_level","")
+                    risk_he = {"high":"גבוה","medium":"בינוני","low":"נמוך"}.get(risk, risk)
+                    st.metric("רמת סיכון", risk_he)
 
-    with tab4:
+                st.write(desc)
+
+                if d.get("why_good_fit_he"):
+                    st.markdown(f"**למה מתאים לך:** {d['why_good_fit_he']}")
+                if d.get("timeline_he"):
+                    st.caption(f"⏱️ ציר זמן: {d['timeline_he']}")
+
+                col_r, col_w = st.columns(2)
+                with col_r:
+                    if d.get("reward_he"):
+                        st.success(f"**פוטנציאל:** {d['reward_he']}")
+                with col_w:
+                    if d.get("risk_he"):
+                        st.warning(f"**סיכון:** {d['risk_he']}")
+
+                if d.get("skills_gap_he"):
+                    st.markdown("**פערי כישורים לסגירה:**")
+                    for sk in d["skills_gap_he"]:
+                        st.markdown(f"• {sk}")
+                    if d.get("bridge_plan_he"):
+                        st.markdown(f"**תוכנית סגירת פערים:** {d['bridge_plan_he']}")
+
+                st.markdown("**תוכנית 30/60/90 יום:**")
+                col30, col60, col90 = st.columns(3)
+                with col30:
+                    st.markdown("**30 יום**")
+                    for a in d.get("plan_30_days_he",[]):
+                        st.markdown(f"• {a}")
+                with col60:
+                    st.markdown("**60 יום**")
+                    for a in d.get("plan_60_days_he",[]):
+                        st.markdown(f"• {a}")
+                with col90:
+                    st.markdown("**90 יום**")
+                    for a in d.get("plan_90_days_he",[]):
+                        st.markdown(f"• {a}")
+
+    # ── TAB 5: Quick Wins & Action Plan ───────────────────────────────────────
+    with tabs[4]:
+        quick_wins = report.get("quick_wins", [])
+        if quick_wins:
+            st.subheader("⚡ ניצחונות מהירים - לעשות עכשיו")
+            for i, w in enumerate(quick_wins, 1):
+                st.markdown(f"**{i}.** {w}")
+            st.divider()
+
+        networking = report.get("networking", {})
+        if networking:
+            st.subheader("🤝 רשת קשרים מקצועית")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.markdown("**קהילות מומלצות:**")
+                for c in networking.get("communities", []):
+                    st.markdown(f"• {c}")
+            with col2:
+                st.markdown("**אירועים ומפגשים:**")
+                for e in networking.get("events", []):
+                    st.markdown(f"• {e}")
+            with col3:
+                st.markdown("**אונליין:**")
+                for o in networking.get("online", []):
+                    st.markdown(f"• {o}")
+
+    # ── TAB 6: Resources ───────────────────────────────────────────────────────
+    with tabs[5]:
+        resources = report.get("resources", {})
+        if resources:
+            courses = resources.get("courses", [])
+            if courses:
+                st.subheader("🎓 קורסים מומלצים")
+                for c in courses:
+                    with st.container(border=True):
+                        st.markdown(f"**{c.get('name','')}** — {c.get('platform','')}")
+                        if c.get("why_he"):
+                            st.caption(c["why_he"])
+
+            books = resources.get("books", [])
+            if books:
+                st.subheader("📖 ספרים מומלצים")
+                for b in books:
+                    with st.container(border=True):
+                        st.markdown(f"**{b.get('title','')}** — {b.get('author','')}")
+                        if b.get("why_he"):
+                            st.caption(b["why_he"])
+
+            certs = resources.get("certifications", [])
+            if certs:
+                st.subheader("🏅 הסמכות מומלצות")
+                for cert in certs:
+                    name = cert.get("name","") if isinstance(cert, dict) else str(cert)
+                    why = cert.get("why_he","") if isinstance(cert, dict) else ""
+                    st.markdown(f"• **{name}**" + (f" - {why}" if why else ""))
+
+    # ── TAB 7: Syllabus ────────────────────────────────────────────────────────
+    with tabs[6]:
         st.subheader(f"סילבוס מותאם אישית — {track['name_he']}")
         syllabus = report.get("syllabus", [])
-
         for session in syllabus:
             phase = session.get("phase", "")
-            color = PHASE_COLORS.get(phase, "#636EFA")
             session_num = session.get("session", "")
             title = session.get("title_he", "")
-
             with st.expander(f"מפגש {session_num} | {phase} | {title}"):
                 col1, col2 = st.columns([1, 1])
                 with col1:
                     st.markdown(f"**מטרה:** {session.get('goal_he', '')}")
-                    st.markdown(f"**הכנה ללקוח:** {session.get('homework_he', '')}")
+                    st.markdown(f"**שיעורי בית:** {session.get('homework_he', '')}")
                     if session.get("homework_adaptation_he"):
-                        st.markdown(f"**התאמה אישית לשיעורי בית:** {session['homework_adaptation_he']}")
+                        st.info(f"התאמה אישית: {session['homework_adaptation_he']}")
                 with col2:
                     if session.get("personalized_focus_he"):
-                        st.markdown("**מיקוד מותאם אישית:**")
+                        st.markdown("**מיקוד מותאם:**")
                         st.info(session["personalized_focus_he"])
-                    key_questions = session.get("key_questions_he", [])
-                    if key_questions:
-                        st.markdown("**שאלות מפתח למפגש:**")
-                        for q in key_questions:
-                            st.markdown(f"• {q}")
-
+                    for q in session.get("key_questions_he", []):
+                        st.markdown(f"• {q}")
                 tools = session.get("tools", [])
                 if tools:
                     st.markdown("**כלים:** " + " | ".join(tools))
