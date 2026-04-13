@@ -32,44 +32,51 @@ def _get_api_key():
     return key
 
 
-def _call_llm(prompt: str, max_tokens: int = 7000) -> str:
+MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
+
+
+def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
     api_key = _get_api_key()
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
-    payload = {
-        "model": "llama-3.3-70b-versatile",
-        "messages": [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": prompt}
-        ],
-        "max_tokens": max_tokens,
-        "temperature": 0.7
-    }
-    for attempt in range(3):
-        resp = requests.post(url, headers=headers, json=payload, timeout=180)
-        if resp.ok:
-            return resp.json()["choices"][0]["message"]["content"]
-        # Rate limit — wait and retry
-        if resp.status_code == 429:
+
+    for model in MODELS:
+        payload = {
+            "model": model,
+            "messages": [
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {"role": "user", "content": prompt}
+            ],
+            "max_tokens": max_tokens,
+            "temperature": 0.7,
+        }
+        for attempt in range(2):
+            resp = requests.post(url, headers=headers, json=payload, timeout=180)
+            if resp.ok:
+                return resp.json()["choices"][0]["message"]["content"]
+            if resp.status_code == 429:
+                try:
+                    wait = float(resp.json()["error"]["message"].split("try again in ")[1].split("s")[0])
+                except Exception:
+                    wait = 65
+                wait = min(wait + 3, 70)
+                try:
+                    import streamlit as st
+                    label = "70b" if "70b" in model else "8b"
+                    st.info(f"מגבלת קצב ({label}) — ממתין {int(wait)} שניות...")
+                except Exception:
+                    pass
+                time.sleep(wait)
+                continue
+            # Non-rate-limit error — break out of retry loop
             try:
-                wait = float(resp.json()["error"]["message"].split("try again in ")[1].split("s")[0])
+                msg = resp.json().get("error", {}).get("message", resp.text[:300])
             except Exception:
-                wait = 60
-            wait = min(wait + 2, 65)  # small buffer, cap at 65s
-            try:
-                import streamlit as st
-                st.info(f"מגבלת קצב Groq — ממתין {int(wait)} שניות ומנסה שוב...")
-            except Exception:
-                pass
-            time.sleep(wait)
-            continue
-        # Other error
-        try:
-            msg = resp.json().get("error", {}).get("message", resp.text[:300])
-        except Exception:
-            msg = resp.text[:300]
-        raise Exception(f"LLM error {resp.status_code}: {msg}")
-    raise Exception("LLM rate limit: נסה שוב בעוד דקה")
+                msg = resp.text[:300]
+            raise Exception(f"LLM error {resp.status_code}: {msg}")
+        # Both attempts with this model failed due to rate limit — try next model
+
+    raise Exception("LLM rate limit על שני המודלים — נסה שוב בעוד דקה")
 
 
 SYSTEM_PROMPT = """You are Israel's top career advisor for high-tech professionals with deep expertise in:
@@ -196,7 +203,7 @@ JSON schema:
     last_err = None
     for attempt in range(2):
         try:
-            raw = _call_llm(prompt, max_tokens=7000).strip()
+            raw = _call_llm(prompt, max_tokens=5000).strip()
             analysis = _extract_json(raw)
             break
         except (json.JSONDecodeError, ValueError) as e:
