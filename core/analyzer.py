@@ -19,7 +19,8 @@ def _call_gemini(prompt: str) -> str:
         "generationConfig": {"maxOutputTokens": 4000, "temperature": 0.7}
     }
     resp = requests.post(url, json=payload, timeout=120)
-    resp.raise_for_status()
+    if not resp.ok:
+        raise Exception(f"Gemini HTTP {resp.status_code}: {resp.text[:500]}")
     return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
 
 SYSTEM_PROMPT = """You are an expert career coach assistant specializing in high-tech professionals in Israel.
