@@ -53,8 +53,13 @@ def init_db():
             insights TEXT,
             recommended_directions TEXT,
             syllabus TEXT,
+            report_data TEXT DEFAULT '',
             generated_at TIMESTAMP DEFAULT NOW()
         )
+    """)
+    # Add report_data column to existing tables if missing
+    c.execute("""
+        ALTER TABLE reports ADD COLUMN IF NOT EXISTS report_data TEXT DEFAULT ''
     """)
 
     c.execute("""
@@ -163,17 +168,19 @@ def save_report(client_id: int, questionnaire_id: int, report: dict) -> int:
     c = conn.cursor()
     c.execute("""
         INSERT INTO reports
-            (client_id, questionnaire_id, track, spider_data, cv_analysis, insights, recommended_directions, syllabus)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
+            (client_id, questionnaire_id, track, spider_data, cv_analysis, insights,
+             recommended_directions, syllabus, report_data)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id
     """, (
         client_id,
         questionnaire_id,
         report.get("track"),
         json.dumps(report.get("spider_data", {}), ensure_ascii=False),
         report.get("cv_analysis", ""),
-        report.get("insights", ""),
+        json.dumps(report.get("insights", []), ensure_ascii=False),
         json.dumps(report.get("recommended_directions", []), ensure_ascii=False),
         json.dumps(report.get("syllabus", []), ensure_ascii=False),
+        json.dumps(report, ensure_ascii=False),
     ))
     rid = c.fetchone()[0]
     conn.commit()
@@ -235,7 +242,12 @@ def get_report(client_id: int) -> dict | None:
     if not row:
         return None
     result = dict(row)
-    result["spider_data"] = json.loads(result["spider_data"])
-    result["recommended_directions"] = json.loads(result["recommended_directions"])
-    result["syllabus"] = json.loads(result["syllabus"])
+    # If full report_data is stored, use it (includes all fields)
+    if result.get("report_data"):
+        return json.loads(result["report_data"])
+    # Fallback for old records
+    result["spider_data"] = json.loads(result["spider_data"]) if result.get("spider_data") else {}
+    result["recommended_directions"] = json.loads(result["recommended_directions"]) if result.get("recommended_directions") else []
+    result["syllabus"] = json.loads(result["syllabus"]) if result.get("syllabus") else []
+    result["insights"] = json.loads(result["insights"]) if result.get("insights") else []
     return result
