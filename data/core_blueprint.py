@@ -1,0 +1,357 @@
+TRACK_A_SESSIONS = [
+    {
+        "session": 1,
+        "phase": "Audit",
+        "title_he": "מיפוי חוויית העבודה ואיתור שואבי אנרגיה",
+        "title_en": "Work Experience Mapping & Energy Drains",
+        "goal_he": "יצירת תמונת מצב מקיפה של שביעות הרצון בקריירה וזיהוי הגורמים המרוקנים אנרגיה",
+        "goal_en": "Creating a comprehensive picture of career satisfaction and identifying energy drains",
+        "tools": ["שאלון הערכת שביעות רצון תעסוקתית", "דף תחומי Well-Being", "מד האנרגיה בעבודה"],
+        "homework_he": "מילוי שאלון שביעות רצון תעסוקתית",
+        "homework_en": "Complete the occupational satisfaction questionnaire",
+        "session_flow_he": [
+            "סקירת 10 התחומים ותוצאות השאלון",
+            "שיקוף והעמקה בתחומים הנמוכים",
+            "אבחון מצברי האנרגיה (חיבור, התקדמות, השפעה)",
+            "הגדרת שואב האנרגיה המרכזי",
+            "הגדרת Vision למצב הרצוי"
+        ],
+    },
+    {
+        "session": 2,
+        "phase": "Audit",
+        "title_he": "זיהוי צרכים ומוקדי שחיקה (Dive Deep)",
+        "title_en": "Needs Identification & Burnout Triggers",
+        "goal_he": "חשיפת הצרכים הפסיכולוגיים הלא-מסופקים והבנת הפער בין המצוי לרצוי",
+        "goal_en": "Exposing unmet psychological needs and understanding the gap between current and desired state",
+        "tools": ["מיכלי הצרכים הבסיסיים בעבודה (אוטונומיה, מסוגלות, שייכות)"],
+        "homework_he": "בחירת אירוע מתסכל אחד מהשבוע האחרון",
+        "homework_en": "Choose one frustrating event from the past week",
+        "session_flow_he": [
+            "ניתוח אירוע בוחן",
+            "מילוי מיכלי הצרכים",
+            "חקירת הפער (חסמים חיצוניים מול פנימיים)",
+            "תרגיל העתיד הרצוי"
+        ],
+    },
+    {
+        "session": 3,
+        "phase": "Core",
+        "title_he": "המצפן הפנימי - חיבור לערכים מניעים",
+        "title_en": "Inner Compass - Core Values",
+        "goal_he": "זיקוק הערכים המהווים את המנוע הפנימי ובדיקת ההלימה שלהם לתפקיד הנוכחי",
+        "goal_en": "Distilling core values and checking their alignment with the current role",
+        "tools": ["רשימת ערכים", "תרגיל בול פגיעה", "יומן ערכים"],
+        "homework_he": "סימון 15 ערכים חשובים מתוך הרשימה",
+        "homework_en": "Mark 15 important values from the list",
+        "session_flow_he": [
+            "תהליך הזיקוק: מ-15 ל-6 ערכים מרכזיים",
+            "עבודה עם בול פגיעה",
+            "הצלבת ערכים-מציאות",
+            "הנחיה ליומן ערכים"
+        ],
+    },
+    {
+        "session": 4,
+        "phase": "Core",
+        "title_he": "חוזקות והצעת הערך",
+        "title_en": "Strengths & Value Proposition",
+        "goal_he": "זיהוי ארגז הכלים הייחודי ובניית הצעת ערך ברורה",
+        "goal_en": "Identifying unique strengths and building a clear value proposition",
+        "tools": ["תרגיל חקירת חוזקות", "דף הצעת הערך התעסוקתית"],
+        "homework_he": "מילוי תרגיל חקירת חוזקות + זיהוי 3 סיטואציות Flow",
+        "homework_en": "Complete strengths exercise + identify 3 Flow situations",
+        "session_flow_he": [
+            "מיפוי 5 חוזקות ליבה",
+            "בניית הצעת הערך",
+            "יישום בהקשרים שונים (שיחת שכר, ראיון, קולגות)",
+            "עבודת בית: יישום חוזקה אחת"
+        ],
+    },
+    {
+        "session": 5,
+        "phase": "Resilience",
+        "title_he": "ניהול חסמים ודפוסי מאבק (החוסן המנטלי)",
+        "title_en": "Managing Blocks & Struggle Patterns (Mental Resilience)",
+        "goal_he": "זיהוי מנגנוני עיכוב מנטליים ולמידת אסטרטגיות התמודדות",
+        "goal_en": "Identifying mental blocking mechanisms and learning coping strategies",
+        "tools": ["יומן מאבק", "מודל SWOT"],
+        "homework_he": "תיעוד אירוע שבו הרגשת 'תקוע' ביומן המאבק",
+        "homework_en": "Document an event where you felt 'stuck' in the struggle journal",
+        "session_flow_he": [
+            "פענוח יומן המאבק",
+            "ניתוח SWOT אישי",
+            "יצירת 'פינוי מקום' - טכניקת חוסן ראשונית"
+        ],
+    },
+    {
+        "session": 6,
+        "phase": "Resilience",
+        "title_he": "מערכת הפעלה לקבלת החלטות (החוסן הקוגניטיבי)",
+        "title_en": "Decision-Making Operating System (Cognitive Resilience)",
+        "goal_he": "הפחתת עומס מנטלי ויצירת ודאות פנימית דרך קבלת החלטה מבוססת ערכים",
+        "goal_en": "Reducing mental load and creating inner certainty through values-based decision making",
+        "tools": ["טבלת קבלת החלטות"],
+        "homework_he": "הגדרת 2-3 דילמות מקצועיות שמתלבטים בהן",
+        "homework_en": "Define 2-3 professional dilemmas you're struggling with",
+        "session_flow_he": [
+            "קביעת קריטריונים להחלטה",
+            "שיטת המשקלים",
+            "שקלול ודירוג",
+            "חיבור רגשי לתוצאה"
+        ],
+    },
+    {
+        "session": 7,
+        "phase": "Resilience",
+        "title_he": "חוסן ביצועי - תכנון תחת לחץ (ממטרה לתכנית עבודה)",
+        "title_en": "Performance Resilience - Planning Under Pressure",
+        "goal_he": "בניית תחושת מסוגלות דרך תרגום ההחלטה לתוכנית פעולה קונקרטית",
+        "goal_en": "Building self-efficacy through translating the decision into a concrete action plan",
+        "tools": ["ממטרה לתוכנית עבודה", "מודל SMART"],
+        "homework_he": "ניסוח יעד מרכזי אחד בעקבות ההחלטה ממפגש 6",
+        "homework_en": "Formulate one main goal following the decision from session 6",
+        "session_flow_he": [
+            "דיוק ה-SMART",
+            "פריטת תוכנית העבודה",
+            "מנגנון חוסן בביצוע - ניהול סיכונים"
+        ],
+    },
+    {
+        "session": 8,
+        "phase": "Impact",
+        "title_he": "ניהול ממשקים וסגנונות תקשורת (השפעה בינאישית)",
+        "title_en": "Interface Management & Communication Styles",
+        "goal_he": "התאמת דרך התקשורת לסביבה כדי לרתום בעלי עניין",
+        "goal_en": "Adapting communication style to environment to engage stakeholders",
+        "tools": ["שאלון סגנונות תקשורת", "דף תקשורת בממשקי עבודה"],
+        "homework_he": "מילוי שאלון סגנונות תקשורת + בחירת דמות מפתח מאתגרת",
+        "homework_en": "Complete communication styles questionnaire + choose a challenging key figure",
+        "session_flow_he": [
+            "זיהוי הסגנון האישי",
+            "מיפוי דמויות מפתח",
+            "פיצוח סגנון התקשורת של 3 דמויות",
+            "בניית גשר תקשורתי",
+            "תכנית פעולה לשבוע"
+        ],
+    },
+    {
+        "session": 9,
+        "phase": "Impact",
+        "title_he": "תוכנית נראות והשפעה אסטרטגית",
+        "title_en": "Visibility & Strategic Influence Plan",
+        "goal_he": "מעבר מ'אני עושה עבודה טובה' ל'אנשים יודעים שאני עושה עבודה טובה'",
+        "goal_en": "Moving from 'I do good work' to 'people know I do good work'",
+        "tools": ["דף תוכנית נראות והשפעה אסטרטגית", "מתודולוגיית CCARI"],
+        "homework_he": "זיהוי 3 הצלחות מהשנה האחרונה + מיפוי פורומים בארגון",
+        "homework_en": "Identify 3 successes from the past year + map organizational forums",
+        "session_flow_he": [
+            "מיפוי הזדמנויות נראות",
+            "Storytelling - מתודולוגיית CCARI",
+            "Executive Presence",
+            "תוכנית פעולה לשבוע"
+        ],
+    },
+    {
+        "session": 10,
+        "phase": "Impact",
+        "title_he": "סיכום, עיגון הצלחות ומניעת נסיגה",
+        "title_en": "Summary, Anchoring Wins & Preventing Regression",
+        "goal_he": "הערכת השינוי, חגיגת ההתקדמות ויצירת מנגנון לשימוש עצמאי בכלים",
+        "goal_en": "Evaluating change, celebrating progress, and creating a mechanism for independent tool use",
+        "tools": ["שאלון הערכת שביעות רצון (מילוי חוזר)", "מד האנרגיה (מילוי חוזר)", "תוכנית 90 ימים"],
+        "homework_he": "מילוי השאלונים מחדש בלי להסתכל על המילוי הראשון",
+        "homework_en": "Refill questionnaires without looking at the first answers",
+        "session_flow_he": [
+            "מבחן התוצאה - השוואה ויזואלית",
+            "רפלקציה על המסע",
+            "בניית נוהל חזרה לשגרה",
+            "פרידה וצידה לדרך"
+        ],
+    },
+]
+
+TRACK_B_SESSIONS = [
+    {
+        "session": 1,
+        "phase": "Audit",
+        "title_he": "מיפוי מקורות לחץ וצווארי בקבוק",
+        "title_en": "Mapping Stress Sources & Bottlenecks",
+        "goal_he": "יצירת תמונת מצב מקיפה של מקורות הלחץ וזיהוי נקודות הכאב המרכזיות",
+        "goal_en": "Creating a comprehensive picture of stress sources and identifying key pain points",
+        "tools": ["שאלון הערכת לחצים ואתגרים", "מפת לחץ", "מד איזון בית-עבודה"],
+        "homework_he": "מילוי שאלון הערכת לחצים + זיהוי 3 נקודות לחץ עיקריות",
+        "homework_en": "Complete stress assessment + identify 3 main stress points",
+        "session_flow_he": [
+            "סקירת מקורות הלחץ",
+            "מיפוי נקודות חום",
+            "ניתוח איזון בית-עבודה",
+            "בחירת מוקד לעבודה"
+        ],
+    },
+    {
+        "session": 2,
+        "phase": "Audit",
+        "title_he": "זיהוי צרכים ומוקדי שחיקה (Dive Deep)",
+        "title_en": "Needs Identification & Burnout Triggers",
+        "goal_he": "חשיפת הצרכים הפסיכולוגיים הלא-מסופקים",
+        "goal_en": "Exposing unmet psychological needs",
+        "tools": ["מיכלי הצרכים הבסיסיים בעבודה"],
+        "homework_he": "בחירת אירוע מלחיץ אחד מהשבוע האחרון",
+        "homework_en": "Choose one stressful event from the past week",
+        "session_flow_he": [
+            "ניתוח אירוע בוחן",
+            "מילוי מיכלי הצרכים",
+            "חקירת הפער"
+        ],
+    },
+    {
+        "session": 3,
+        "phase": "Core",
+        "title_he": "המצפן הפנימי - ערכים מול מציאות",
+        "title_en": "Inner Compass - Values vs Reality",
+        "goal_he": "זיקוק ערכי הליבה וזיהוי קונפליקטים בין ערכים למציאות",
+        "goal_en": "Distilling core values and identifying conflicts between values and reality",
+        "tools": ["רשימת ערכים", "בול פגיעה", "תרגיל קונפליקט ערכים"],
+        "homework_he": "סימון 15 ערכים חשובים",
+        "homework_en": "Mark 15 important values",
+        "session_flow_he": [
+            "תהליך הזיקוק מ-15 ל-6",
+            "עבודה עם בול פגיעה",
+            "זיהוי קונפליקט ערכים",
+            "הגדרת גבולות ערכיים"
+        ],
+    },
+    {
+        "session": 4,
+        "phase": "Core",
+        "title_he": "חוזקות וסגנון תקשורת",
+        "title_en": "Strengths & Communication Style",
+        "goal_he": "זיהוי ארגז הכלים הייחודי ושיפור האינטראקציה הבינאישית",
+        "goal_en": "Identifying unique strengths and improving interpersonal interaction",
+        "tools": ["תרגיל חקירת חוזקות", "שאלון סגנונות תקשורת"],
+        "homework_he": "מילוי שאלון סגנונות תקשורת",
+        "homework_en": "Complete communication styles questionnaire",
+        "session_flow_he": [
+            "מיפוי 5 חוזקות ליבה",
+            "ניתוח סגנון תקשורת"
+        ],
+    },
+    {
+        "session": 5,
+        "phase": "Resilience",
+        "title_he": "שחרור שליטה - פרפקציוניזם, האצלה וקבלה",
+        "title_en": "Releasing Control - Perfectionism, Delegation & Acceptance",
+        "goal_he": "זיהוי דפוסי ריכוזיות ולמידת כלים לשחרור שליטה",
+        "goal_en": "Identifying centralization patterns and learning control release tools",
+        "tools": ["תרגיל דפוסי שליטה", "מטריצת Trust", "תוכנית האצלה", "מטריצת ACT"],
+        "homework_he": "רשימת משימות שבועיות + סימון מה 'חייב' לעשות לבד",
+        "homework_en": "Weekly task list + marking what 'must' be done alone",
+        "session_flow_he": [
+            "זיהוי דפוסי שליטה ופרפקציוניזם",
+            "תרגיל האצלה או בקשת עזרה",
+            "קבלת אי-ודאות"
+        ],
+    },
+    {
+        "session": 6,
+        "phase": "Resilience",
+        "title_he": "דפוסי מאבק וניהול לחץ",
+        "title_en": "Struggle Patterns & Stress Management",
+        "goal_he": "זיהוי מנגנוני עיכוב מנטליים ולמידת אסטרטגיות התמודדות",
+        "goal_en": "Identifying mental blocking mechanisms and coping strategies",
+        "tools": ["יומן מאבק", "מפת טריגרים"],
+        "homework_he": "תיעוד אירוע שבו הרגשת 'תקוע'",
+        "homework_en": "Document an event where you felt 'stuck'",
+        "session_flow_he": [
+            "פענוח יומן המאבק",
+            "מיפוי טריגרים",
+            "כלי ACT לפרפקציוניזם"
+        ],
+    },
+    {
+        "session": 7,
+        "phase": "Resilience",
+        "title_he": "בניית גבולות וניהול זמן",
+        "title_en": "Building Boundaries & Time Management",
+        "goal_he": "יצירת גבולות ברורים בין עבודה לבית וכלים לניהול זמן יעיל",
+        "goal_en": "Creating clear work-life boundaries and effective time management tools",
+        "tools": ["Time Audit", "הצהרת גבולות אישית", "Calendar Blocking"],
+        "homework_he": "תיעוד שבוע טיפוסי - שעות עבודה, בית, 'לא-נגיש'",
+        "homework_en": "Document a typical week - work hours, home, 'unavailable' times",
+        "session_flow_he": [
+            "Time Audit",
+            "הגדרת גבולות",
+            "תקשורת גבולות",
+            "Calendar Blocking"
+        ],
+    },
+    {
+        "session": 8,
+        "phase": "Impact",
+        "title_he": "בניית תוכנית איזון",
+        "title_en": "Building a Balance Plan",
+        "goal_he": "תרגום התובנות לתוכנית פעולה קונקרטית לאיזון בר-קיימא",
+        "goal_en": "Translating insights into a concrete action plan for sustainable balance",
+        "tools": ["מיעד לתוכנית (SMART)", "ניהול חסמים וסיכונים"],
+        "homework_he": "הגדרת יעד מרכזי אחד לאיזון + זיהוי 1-2 אנשי תמיכה",
+        "homework_en": "Define one main balance goal + identify 1-2 support people",
+        "session_flow_he": [
+            "בניית יעד SMART",
+            "תכנון השבוע הראשון",
+            "מיפוי חסמים ומערכת תמיכה",
+            "תסריטים לשיחות מפתח"
+        ],
+    },
+    {
+        "session": 9,
+        "phase": "Impact",
+        "title_he": "תקשורת מקרבת וחיבור מחדש",
+        "title_en": "Compassionate Communication & Reconnection",
+        "goal_he": "שיפור התקשורת עם בן/בת זוג, ילדים, וממשקים מאתגרים בעבודה",
+        "goal_en": "Improving communication with partner, children, and challenging workplace interfaces",
+        "tools": ["שיחת Check-in עם בן/בת זוג", "NVC", "לא אסרטיבי", "Managing Up", "חמלה עצמית"],
+        "homework_he": "זיהוי 1-2 ממשקים מאתגרים + תיאור סיטואציה מלחיצה",
+        "homework_en": "Identify 1-2 challenging interfaces + describe a stressful situation",
+        "session_flow_he": [
+            "תקשורת עם בן/בת זוג ומשפחה",
+            "תקשורת בעבודה - גבולות וציפיות",
+            "חמלה עצמית",
+            "סימולציה ותרגול"
+        ],
+    },
+    {
+        "session": 10,
+        "phase": "Impact",
+        "title_he": "סיכום, עיגון הצלחות ומניעת נסיגה",
+        "title_en": "Summary, Anchoring Wins & Preventing Regression",
+        "goal_he": "הערכת השינוי, חגיגת ההתקדמות ויצירת מנגנון לשימוש עצמאי",
+        "goal_en": "Evaluating change, celebrating progress, and creating independent use mechanism",
+        "tools": ["שאלון הערכת לחצים (חוזר)", "מד איזון בית-עבודה (חוזר)", "פרוטוקול עזרה ראשונה", "ארגז הכלים"],
+        "homework_he": "מילוי השאלונים מחדש",
+        "homework_en": "Refill the questionnaires",
+        "session_flow_he": [
+            "מבחן התוצאה",
+            "רפלקציה על המסע",
+            "בניית פרוטוקול עזרה ראשונה",
+            "ארגז הכלים שלי"
+        ],
+    },
+]
+
+TRACKS = {
+    "A": {
+        "name_he": "מסלול א' — שינוי קריירה וצמיחה מקצועית",
+        "name_en": "Track A — Career Change & Professional Growth",
+        "profile_he": "מקצוען/ית המחפש/ת שינוי קריירה, מעבר תפקיד, או בהירות לגבי הכיוון המקצועי הבא",
+        "profile_en": "Professional seeking career change, role transition, or clarity about next professional direction",
+        "sessions": TRACK_A_SESSIONS,
+    },
+    "B": {
+        "name_he": "מסלול ב' — חוסן תעסוקתי ואיזון בחיים",
+        "name_en": "Track B — Employment Resilience & Work-Life Balance",
+        "profile_he": "מנהל/ת בכיר/ה או עובד/ת בתפקיד תובעני המתמודד/ת עם לחץ גבוה ואיזון מאתגר",
+        "profile_en": "Senior manager or employee in a demanding role dealing with high pressure and challenging balance",
+        "sessions": TRACK_B_SESSIONS,
+    },
+}
