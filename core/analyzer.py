@@ -1,14 +1,15 @@
 import os
 import json
-import anthropic
+import google.generativeai as genai
 from data.core_blueprint import TRACKS
 
-client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+model = genai.GenerativeModel("gemini-1.5-flash")
 
 SYSTEM_PROMPT = """You are an expert career coach assistant specializing in high-tech professionals in Israel.
 You help analyze career questionnaires and CVs to generate personalized coaching insights and session syllabi based on the CORE Blueprint methodology.
 Always respond in valid JSON format as specified in the user prompt.
-Be specific, empathetic, and actionable. Tailor all insights to the high-tech context."""
+Be specific, empathetic, and actionable. Tailor all insights to the high-tech context in Israel (2024-2025)."""
 
 
 def analyze_client(questionnaire: dict, client_info: dict) -> dict:
@@ -16,7 +17,8 @@ def analyze_client(questionnaire: dict, client_info: dict) -> dict:
     part_b = questionnaire["part_b"]
     cv_text = questionnaire.get("cv_text", "")
 
-    prompt = f"""
+    prompt = f"""{SYSTEM_PROMPT}
+
 Analyze this high-tech professional's career questionnaire and CV.
 
 CLIENT INFO:
@@ -33,7 +35,6 @@ PART A - OCCUPATIONAL SATISFACTION (1-10 scale):
 8. Meaning & purpose: {part_a.get('q8', 'N/A')}
 9. Interest & self-actualization: {part_a.get('q9', 'N/A')}
 10. Influence & initiative: {part_a.get('q10', 'N/A')}
-Top 3 urgent areas to improve: {part_a.get('top3', [])}
 
 PART B - PROFESSIONAL DIRECTION:
 1. Seniority level: {part_b.get('seniority', 'N/A')}
@@ -49,7 +50,7 @@ PART B - PROFESSIONAL DIRECTION:
 11. Skills to develop: {part_b.get('skills_to_develop', 'N/A')}
 12. Definition of success: {part_b.get('success_definition', 'N/A')}
 
-Note: Assess market demand for this person's profile based on current tech industry trends in Israel (2024-2025).
+Note: Based on their field, role, and skills, assess their market demand in the Israeli high-tech market (2024-2025 trends).
 
 CV TEXT (if provided):
 {cv_text if cv_text else 'No CV provided'}
@@ -107,20 +108,14 @@ Based on this data, provide a comprehensive analysis in the following JSON struc
       "personalized_focus_he": "Specific focus for THIS client in session 1 (2-3 sentences connecting their data to the session goal)",
       "key_questions_he": ["Question 1 tailored to client", "Question 2", "Question 3"],
       "homework_adaptation_he": "Any adaptation to the standard homework based on their situation"
-    }},
-    ... (sessions 2-10)
+    }}
   ]
 }}
-"""
 
-    response = client.messages.create(
-        model="claude-opus-4-6",
-        max_tokens=4000,
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": prompt}]
-    )
+Return ONLY valid JSON, no markdown, no code blocks."""
 
-    raw = response.content[0].text.strip()
+    response = model.generate_content(prompt)
+    raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
