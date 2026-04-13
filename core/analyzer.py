@@ -3,15 +3,14 @@ import json
 import google.generativeai as genai
 from data.core_blueprint import TRACKS
 
-def _get_google_key():
+def _get_model():
     try:
         import streamlit as st
-        return st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        api_key = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
     except Exception:
-        return os.getenv("GOOGLE_API_KEY")
-
-genai.configure(api_key=_get_google_key())
-model = genai.GenerativeModel("gemini-1.5-flash")
+        api_key = os.getenv("GOOGLE_API_KEY")
+    genai.configure(api_key=api_key)
+    return genai.GenerativeModel("gemini-1.5-flash")
 
 SYSTEM_PROMPT = """You are an expert career coach assistant specializing in high-tech professionals in Israel.
 You help analyze career questionnaires and CVs to generate personalized coaching insights and session syllabi based on the CORE Blueprint methodology.
@@ -121,7 +120,7 @@ Based on this data, provide a comprehensive analysis in the following JSON struc
 
 Return ONLY valid JSON, no markdown, no code blocks."""
 
-    response = model.generate_content(prompt)
+    response = _get_model().generate_content(prompt)
     raw = response.text.strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
