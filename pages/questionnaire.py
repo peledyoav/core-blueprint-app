@@ -4,9 +4,8 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from core.database import init_db, get_client_by_token, save_questionnaire, get_questionnaire
-from core.analyzer import analyze_client, extract_cv_text
-from core.database import save_report
+from core.database import (init_db, get_client_by_token, save_questionnaire,
+                           get_questionnaire, save_draft, get_draft, delete_draft, save_report)
 
 st.set_page_config(page_title="CORE Blueprint — שאלון", layout="centered", page_icon="🧭")
 
@@ -209,6 +208,20 @@ def main():
         st.balloons()
         return
 
+    # Restore draft into session_state on first load
+    if "draft_loaded" not in st.session_state:
+        draft = get_draft(client["id"])
+        if draft:
+            for k, v in draft["part_a"].items():
+                st.session_state[f"pa_{k}"] = v
+            for k, v in draft["part_b"].items():
+                st.session_state[f"pb_{k}"] = v
+            st.session_state["field_current"] = draft["part_b"].get("field_current", FIELDS[lang][0])
+            st.session_state["field_desired"] = draft["part_b"].get("field_desired", FIELDS[lang][0])
+            st.session_state["role_current"] = draft["part_b"].get("role_current", "")
+            st.session_state["role_desired"] = draft["part_b"].get("role_desired", "")
+        st.session_state["draft_loaded"] = True
+
     st.title(L["title"])
     st.markdown(f"**{L['welcome']}, {client['name']}**")
     st.markdown(f"*{L['subtitle']}*")
@@ -253,45 +266,25 @@ def main():
         part_b = {}
 
         if lang == "he":
-            part_b["seniority"] = st.selectbox("רמת בכירות נוכחית", SENIORITY_OPTIONS)
-            part_b["ic_manager"] = st.slider(
-                "IC או Manager? (1 = טכני מלא, 10 = ניהול אנשים מלא)", 1, 10, 5)
-            part_b["technical_depth"] = st.slider(
-                "כמה חשוב לך להישאר 'בחומר הטכני' ביומיום? (1-10)", 1, 10, 5)
-            part_b["company_stage"] = st.slider(
-                "סטייג' חברה מועדף (1 = Startup מוקדם, 10 = Enterprise גדול)", 1, 10, 5)
-            part_b["market_demand"] = st.slider(
-                "כמה אתה מרגיש שהכישורים שלך מבוקשים בשוק היום? (1-10)", 1, 10, 5)
-            part_b["main_concerns"] = st.multiselect(
-                "מה החשש המרכזי שלך לגבי העתיד המקצועי? (עד 2)",
-                options=CONCERNS[lang], max_selections=2)
-            part_b["main_obstacle"] = st.multiselect(
-                "מה המכשול העיקרי שמונע ממך לעשות את השינוי? (עד 2)",
-                options=OBSTACLES[lang], max_selections=2)
-            part_b["skills_to_develop"] = st.text_area(
-                "אילו כישורים תרצה לפתח ב-12 חודשים הקרובים? (משפט אחד)", max_chars=300)
-            part_b["success_definition"] = st.text_area(
-                "מה ייראה לך כהצלחה בסוף התהליך? (משפט אחד)", max_chars=300)
+            part_b["seniority"] = st.selectbox("רמת בכירות נוכחית", SENIORITY_OPTIONS, key="pb_seniority")
+            part_b["ic_manager"] = st.slider("IC או Manager? (1 = טכני מלא, 10 = ניהול אנשים מלא)", 1, 10, 5, key="pb_ic_manager")
+            part_b["technical_depth"] = st.slider("כמה חשוב לך להישאר 'בחומר הטכני' ביומיום? (1-10)", 1, 10, 5, key="pb_technical_depth")
+            part_b["company_stage"] = st.slider("סטייג' חברה מועדף (1 = Startup מוקדם, 10 = Enterprise גדול)", 1, 10, 5, key="pb_company_stage")
+            part_b["market_demand"] = st.slider("כמה אתה מרגיש שהכישורים שלך מבוקשים בשוק היום? (1-10)", 1, 10, 5, key="pb_market_demand")
+            part_b["main_concerns"] = st.multiselect("מה החשש המרכזי שלך לגבי העתיד המקצועי? (עד 2)", options=CONCERNS[lang], max_selections=2, key="pb_main_concerns")
+            part_b["main_obstacle"] = st.multiselect("מה המכשול העיקרי שמונע ממך לעשות את השינוי? (עד 2)", options=OBSTACLES[lang], max_selections=2, key="pb_main_obstacle")
+            part_b["skills_to_develop"] = st.text_area("אילו כישורים תרצה לפתח ב-12 חודשים הקרובים? (משפט אחד)", max_chars=300, key="pb_skills_to_develop")
+            part_b["success_definition"] = st.text_area("מה ייראה לך כהצלחה בסוף התהליך? (משפט אחד)", max_chars=300, key="pb_success_definition")
         else:
-            part_b["seniority"] = st.selectbox("Current seniority level", SENIORITY_OPTIONS)
-            part_b["ic_manager"] = st.slider(
-                "IC or Manager? (1 = fully technical, 10 = people management)", 1, 10, 5)
-            part_b["technical_depth"] = st.slider(
-                "How important is staying 'in the technical material' daily? (1-10)", 1, 10, 5)
-            part_b["company_stage"] = st.slider(
-                "Preferred company stage (1 = Early Startup, 10 = Large Enterprise)", 1, 10, 5)
-            part_b["market_demand"] = st.slider(
-                "How in-demand do you feel your skills are today? (1-10)", 1, 10, 5)
-            part_b["main_concerns"] = st.multiselect(
-                "Main concerns about your professional future? (up to 2)",
-                options=CONCERNS[lang], max_selections=2)
-            part_b["main_obstacle"] = st.multiselect(
-                "Main obstacle preventing you from making a change? (up to 2)",
-                options=OBSTACLES[lang], max_selections=2)
-            part_b["skills_to_develop"] = st.text_area(
-                "Skills to develop in the next 12 months? (one sentence)", max_chars=300)
-            part_b["success_definition"] = st.text_area(
-                "What would success look like at the end of the process? (one sentence)", max_chars=300)
+            part_b["seniority"] = st.selectbox("Current seniority level", SENIORITY_OPTIONS, key="pb_seniority")
+            part_b["ic_manager"] = st.slider("IC or Manager? (1 = fully technical, 10 = people management)", 1, 10, 5, key="pb_ic_manager")
+            part_b["technical_depth"] = st.slider("How important is staying 'in the technical material' daily? (1-10)", 1, 10, 5, key="pb_technical_depth")
+            part_b["company_stage"] = st.slider("Preferred company stage (1 = Early Startup, 10 = Large Enterprise)", 1, 10, 5, key="pb_company_stage")
+            part_b["market_demand"] = st.slider("How in-demand do you feel your skills are today? (1-10)", 1, 10, 5, key="pb_market_demand")
+            part_b["main_concerns"] = st.multiselect("Main concerns about your professional future? (up to 2)", options=CONCERNS[lang], max_selections=2, key="pb_main_concerns")
+            part_b["main_obstacle"] = st.multiselect("Main obstacle preventing you from making a change? (up to 2)", options=OBSTACLES[lang], max_selections=2, key="pb_main_obstacle")
+            part_b["skills_to_develop"] = st.text_area("Skills to develop in the next 12 months? (one sentence)", max_chars=300, key="pb_skills_to_develop")
+            part_b["success_definition"] = st.text_area("What would success look like at the end of the process? (one sentence)", max_chars=300, key="pb_success_definition")
 
         st.divider()
 
@@ -303,7 +296,30 @@ def main():
             type=["pdf", "docx"]
         )
 
-        submitted = st.form_submit_button(L["submit"], type="primary", use_container_width=True)
+        col_save, col_submit = st.columns([1, 2])
+        with col_save:
+            save_btn = st.form_submit_button(
+                "💾 שמור טיוטה" if lang == "he" else "💾 Save Draft",
+                use_container_width=True
+            )
+        with col_submit:
+            submitted = st.form_submit_button(L["submit"], type="primary", use_container_width=True)
+
+    if save_btn:
+        draft_part_b = {
+            "field_current": st.session_state.get("field_current", ""),
+            "field_desired": st.session_state.get("field_desired", ""),
+            "role_current": st.session_state.get("role_current", ""),
+            "role_desired": st.session_state.get("role_desired", ""),
+        }
+        for k in ["seniority", "ic_manager", "technical_depth", "company_stage",
+                  "market_demand", "main_concerns", "main_obstacle",
+                  "skills_to_develop", "success_definition"]:
+            if f"pb_{k}" in st.session_state:
+                draft_part_b[k] = st.session_state[f"pb_{k}"]
+        draft_part_a = {k: st.session_state.get(f"pa_{k}", 5) for k in PART_A_KEYS}
+        save_draft(client["id"], draft_part_a, draft_part_b)
+        st.success("✅ הטיוטה נשמרה!" if lang == "he" else "✅ Draft saved!")
 
     if submitted:
         # Merge field/role from session state into part_b
@@ -322,6 +338,7 @@ def main():
             questionnaire = {"part_a": part_a, "part_b": part_b, "cv_text": cv_text}
             report = analyze_client(questionnaire, client)
             save_report(client["id"], qid, report)
+        delete_draft(client["id"])
 
         st.success(L["success"])
         st.balloons()

@@ -59,6 +59,17 @@ def init_db():
         )
     """)
 
+    c.execute("""
+        CREATE TABLE IF NOT EXISTS drafts (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            client_id INTEGER NOT NULL UNIQUE,
+            part_a TEXT,
+            part_b TEXT,
+            updated_at TEXT DEFAULT (datetime('now')),
+            FOREIGN KEY (client_id) REFERENCES clients(id)
+        )
+    """)
+
     conn.commit()
     conn.close()
 
@@ -156,6 +167,42 @@ def save_report(client_id: int, questionnaire_id: int, report: dict) -> int:
     conn.commit()
     conn.close()
     return rid
+
+
+def save_draft(client_id: int, part_a: dict, part_b: dict):
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("""
+        INSERT INTO drafts (client_id, part_a, part_b, updated_at)
+        VALUES (?, ?, ?, datetime('now'))
+        ON CONFLICT(client_id) DO UPDATE SET
+            part_a=excluded.part_a,
+            part_b=excluded.part_b,
+            updated_at=excluded.updated_at
+    """, (client_id, json.dumps(part_a, ensure_ascii=False), json.dumps(part_b, ensure_ascii=False)))
+    conn.commit()
+    conn.close()
+
+
+def get_draft(client_id: int) -> dict | None:
+    conn = get_connection()
+    c = conn.cursor()
+    row = c.execute("SELECT * FROM drafts WHERE client_id = ?", (client_id,)).fetchone()
+    conn.close()
+    if not row:
+        return None
+    result = dict(row)
+    result["part_a"] = json.loads(result["part_a"]) if result["part_a"] else {}
+    result["part_b"] = json.loads(result["part_b"]) if result["part_b"] else {}
+    return result
+
+
+def delete_draft(client_id: int):
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("DELETE FROM drafts WHERE client_id = ?", (client_id,))
+    conn.commit()
+    conn.close()
 
 
 def get_report(client_id: int) -> dict | None:
