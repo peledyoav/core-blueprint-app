@@ -447,13 +447,18 @@ def main():
             cv_text = extract_cv_text(cv_file.read(), cv_file.name)
 
         qid = save_questionnaire(client["id"], part_a, part_b, cv_text)
-
-        with st.spinner("מנתח נתונים ובונה את הדוח האישי שלך... (כ-30 שניות)" if lang=="he" else "Analyzing data and building your personal report... (~30 seconds)"):
-            questionnaire = {"part_a": part_a, "part_b": part_b, "cv_text": cv_text}
-            report = analyze_client(questionnaire, client)
-            save_report(client["id"], qid, report)
-
         delete_draft(client["id"])
+
+        # Try to generate the report immediately; if rate-limited, the mentor
+        # can generate it from the dashboard — questionnaire data is already saved.
+        try:
+            with st.spinner("מנתח נתונים ובונה את הדוח האישי שלך... (עד 2 דקות)" if lang=="he" else "Analyzing data and building your personal report... (up to 2 min)"):
+                questionnaire_data = {"part_a": part_a, "part_b": part_b, "cv_text": cv_text}
+                report = analyze_client(questionnaire_data, client)
+                save_report(client["id"], qid, report)
+        except Exception:
+            pass  # questionnaire saved; mentor will generate report from dashboard
+
         st.success(L["success"])
         st.balloons()
 
