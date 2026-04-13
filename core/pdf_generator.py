@@ -251,7 +251,7 @@ def generate_client_pdf(report: dict, client_name: str) -> bytes:
 
     if roles:
         pdf.add_page()
-        pdf.section_title("התפקידים המומלצים עבורך", "")
+        pdf.section_title("התפקידים המומלצים עבורך")
         pdf.ln(2)
         pdf.set_font("Alef", size=9)
         pdf.set_text_color(*TEXT_GRAY)
