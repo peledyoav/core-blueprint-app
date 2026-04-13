@@ -44,11 +44,12 @@ PART B - PROFESSIONAL DIRECTION:
 6. IC vs Manager (1=full IC, 10=full Manager): {part_b.get('ic_manager', 'N/A')}
 7. Technical depth importance (1-10): {part_b.get('technical_depth', 'N/A')}
 8. Preferred company stage (1=Startup, 10=Enterprise): {part_b.get('company_stage', 'N/A')}
-9. Market demand feeling (1-10): {part_b.get('market_demand', 'N/A')}
-10. Main concerns: {part_b.get('main_concerns', [])}
-11. Main obstacle to change: {part_b.get('main_obstacle', [])}
-12. Skills to develop: {part_b.get('skills_to_develop', 'N/A')}
-13. Definition of success: {part_b.get('success_definition', 'N/A')}
+9. Main concerns: {part_b.get('main_concerns', [])}
+10. Main obstacle to change: {part_b.get('main_obstacle', [])}
+11. Skills to develop: {part_b.get('skills_to_develop', 'N/A')}
+12. Definition of success: {part_b.get('success_definition', 'N/A')}
+
+Note: Assess market demand for this person's profile based on current tech industry trends in Israel (2024-2025).
 
 CV TEXT (if provided):
 {cv_text if cv_text else 'No CV provided'}
