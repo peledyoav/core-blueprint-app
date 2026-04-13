@@ -134,26 +134,39 @@ def show_client_report(client_id: int):
 
     st.title(f"📊 דוח — {client['name']}")
 
-    col1, col2 = st.columns([1, 1])
+    col1, col2, col3 = st.columns([1, 2, 1])
     with col1:
         st.metric("מסלול מומלץ", track["name_he"])
     with col2:
-        st.info(report["track_reason_he"])
+        if report.get("track_reason_he"):
+            st.info(report["track_reason_he"])
+    with col3:
+        if st.button("🔄 צור דוח מחדש", key=f"regen_{client_id}"):
+            with st.spinner("מנתח מחדש..."):
+                q = get_questionnaire(client_id)
+                rep = analyze_client(q, client)
+                save_report(client_id, q["id"], rep)
+            st.success("הדוח עודכן!")
+            st.rerun()
 
     tab1, tab2, tab3, tab4 = st.tabs(["📈 פרופיל", "🔍 תובנות", "🗺️ כיוונים", "📋 סילבוס"])
 
     with tab1:
         col1, col2 = st.columns([3, 2])
         with col1:
-            fig = create_spider_chart(report["spider_data"], client["name"])
-            st.plotly_chart(fig, use_container_width=True)
+            spider = report.get("spider_data", {})
+            if spider:
+                fig = create_spider_chart(spider, client["name"])
+                st.plotly_chart(fig, use_container_width=True)
         with col2:
-            fig2 = create_energy_bars(report.get("energy_batteries", {}))
-            st.plotly_chart(fig2, use_container_width=True)
+            batteries = report.get("energy_batteries", {})
+            if batteries:
+                fig2 = create_energy_bars(batteries)
+                st.plotly_chart(fig2, use_container_width=True)
 
         if report.get("cv_analysis"):
             st.subheader("ניתוח קורות חיים")
-            st.write(report["cv_analysis"])
+            st.write(report.get("cv_analysis", ""))
             milestones = report.get("cv_milestones", [])
             if milestones:
                 st.subheader("אבני דרך עיקריות")
@@ -163,8 +176,11 @@ def show_client_report(client_id: int):
     with tab2:
         st.subheader("תובנות מרכזיות")
         insights = report.get("insights", [])
-        for i, insight in enumerate(insights, 1):
-            st.markdown(f"**{i}.** {insight}")
+        if isinstance(insights, list):
+            for i, insight in enumerate(insights, 1):
+                st.markdown(f"**{i}.** {insight}")
+        else:
+            st.write(insights)
 
     with tab3:
         st.subheader("כיווני פיתוח מומלצים")
