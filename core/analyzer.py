@@ -1,16 +1,26 @@
 import os
 import json
-import google.generativeai as genai
+import requests
 from data.core_blueprint import TRACKS
 
-def _get_model():
+def _get_api_key():
     try:
         import streamlit as st
-        api_key = st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        return st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
     except Exception:
-        api_key = os.getenv("GOOGLE_API_KEY")
-    genai.configure(api_key=api_key)
-    return genai.GenerativeModel("gemini-1.5-flash")
+        return os.getenv("GOOGLE_API_KEY")
+
+
+def _call_gemini(prompt: str) -> str:
+    api_key = _get_api_key()
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
+    payload = {
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"maxOutputTokens": 4000, "temperature": 0.7}
+    }
+    resp = requests.post(url, json=payload, timeout=120)
+    resp.raise_for_status()
+    return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
 
 SYSTEM_PROMPT = """You are an expert career coach assistant specializing in high-tech professionals in Israel.
 You help analyze career questionnaires and CVs to generate personalized coaching insights and session syllabi based on the CORE Blueprint methodology.
@@ -120,8 +130,7 @@ Based on this data, provide a comprehensive analysis in the following JSON struc
 
 Return ONLY valid JSON, no markdown, no code blocks."""
 
-    response = _get_model().generate_content(prompt)
-    raw = response.text.strip()
+    raw = _call_gemini(prompt).strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
