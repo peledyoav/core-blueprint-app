@@ -27,7 +27,6 @@ LABELS = {
         "already_submitted": "השאלון שלך כבר נשלח. תודה!",
         "invalid_token": "הקישור אינו תקין. פנה/י למנטור שלך.",
         "success": "השאלון נשלח בהצלחה! תודה רבה.",
-        "top3_label": "בחר/י 3 תחומים הדחופים ביותר לשיפור:",
         "lang_toggle": "English",
     },
     "en": {
@@ -44,7 +43,6 @@ LABELS = {
         "already_submitted": "Your questionnaire has already been submitted. Thank you!",
         "invalid_token": "Invalid link. Please contact your mentor.",
         "success": "Questionnaire submitted successfully! Thank you.",
-        "top3_label": "Select the 3 most urgent areas to improve:",
         "lang_toggle": "עברית",
     }
 }
@@ -168,15 +166,6 @@ def main():
                 min_value=1, max_value=10, value=5,
                 key=f"part_a_{key}"
             )
-
-        short_labels = PART_A_SHORT[lang]
-        top3 = st.multiselect(
-            L["top3_label"],
-            options=short_labels,
-            max_selections=3,
-            key="top3"
-        )
-        part_a["top3"] = top3
 
         st.divider()
 
