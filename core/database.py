@@ -81,6 +81,30 @@ def _dictrow(row):
     return dict(row) if row else None
 
 
+def update_client(client_id: int, name: str, email: str, notes: str = ""):
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute(
+        "UPDATE clients SET name=%s, email=%s, notes=%s WHERE id=%s",
+        (name, email, notes, client_id)
+    )
+    conn.commit()
+    c.close()
+    conn.close()
+
+
+def delete_client(client_id: int):
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("DELETE FROM drafts WHERE client_id=%s", (client_id,))
+    c.execute("DELETE FROM reports WHERE client_id=%s", (client_id,))
+    c.execute("DELETE FROM questionnaires WHERE client_id=%s", (client_id,))
+    c.execute("DELETE FROM clients WHERE id=%s", (client_id,))
+    conn.commit()
+    c.close()
+    conn.close()
+
+
 def add_client(name: str, email: str, token: str, notes: str = "") -> int:
     conn = get_connection()
     c = conn.cursor()

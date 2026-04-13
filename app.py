@@ -8,7 +8,8 @@ from dotenv import load_dotenv
 load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent))
 
-from core.database import init_db, add_client, get_all_clients, get_client_by_id, get_questionnaire, get_report, save_report
+from core.database import (init_db, add_client, update_client, delete_client,
+                           get_all_clients, get_client_by_id, get_questionnaire, get_report, save_report)
 from core.analyzer import analyze_client
 from core.charts import create_spider_chart, create_energy_bars
 from data.core_blueprint import TRACKS
@@ -160,6 +161,27 @@ def page_clients():
                             report = analyze_client(q, c)
                             save_report(client["id"], q["id"], report)
                         st.success("הדוח נוצר!")
+                        st.rerun()
+
+            # Edit / Delete
+            with st.popover("✏️ עריכה / מחיקה"):
+                st.markdown("**עריכת פרטי לקוח:**")
+                new_name = st.text_input("שם", value=client["name"], key=f"edit_name_{client['id']}")
+                new_email = st.text_input("אימייל", value=client["email"], key=f"edit_email_{client['id']}")
+                new_notes = st.text_area("הערות", value=client.get("notes",""), key=f"edit_notes_{client['id']}")
+                if st.button("💾 שמור שינויים", key=f"save_{client['id']}", type="primary"):
+                    update_client(client["id"], new_name, new_email, new_notes)
+                    st.success("עודכן!")
+                    st.rerun()
+                st.divider()
+                st.markdown("**מחיקת לקוח:**")
+                confirm = st.checkbox(f"אני מאשר מחיקת {client['name']} וכל הנתונים שלו", key=f"confirm_{client['id']}")
+                if confirm:
+                    if st.button("🗑️ מחק לקוח", key=f"delete_{client['id']}", type="secondary"):
+                        delete_client(client["id"])
+                        if st.session_state.get("view_client_id") == client["id"]:
+                            del st.session_state["view_client_id"]
+                        st.success("הלקוח נמחק.")
                         st.rerun()
 
     if "view_client_id" in st.session_state:
