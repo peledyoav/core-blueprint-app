@@ -278,6 +278,20 @@ def show_client_report(client_id: int):
             st.markdown("**ניתוח שוק:**")
             st.write(report["market_analysis_he"])
 
+        roadmap = report.get("career_roadmap", {})
+        if roadmap:
+            st.subheader("🗺️ מסלול קריירה")
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.markdown("**שנה 1**")
+                st.info(roadmap.get("year_1", ""))
+            with col2:
+                st.markdown("**3 שנים**")
+                st.info(roadmap.get("year_3", ""))
+            with col3:
+                st.markdown("**5 שנים**")
+                st.info(roadmap.get("year_5", ""))
+
     # ── TAB 2: Profile ─────────────────────────────────────────────────────────
     with tabs[1]:
         col1, col2 = st.columns([3, 2])
@@ -340,7 +354,9 @@ def show_client_report(client_id: int):
     with tabs[3]:
         directions = report.get("recommended_directions", [])
         for d in directions:
-            title = d.get("title_he") or d.get("title", "")
+            eng = d.get("title", "")
+            heb = d.get("title_he", "")
+            title = f"{eng} — {heb}" if eng and heb else (eng or heb)
             desc = d.get("description_he") or d.get("description", "")
             with st.expander(f"**{title}** — התאמה: {d.get('fit_score','?')}/10", expanded=True):
                 col1, col2, col3, col4 = st.columns(4)

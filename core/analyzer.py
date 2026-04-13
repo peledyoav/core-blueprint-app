@@ -72,14 +72,17 @@ def _call_llm(prompt: str, max_tokens: int = 7000) -> str:
     raise Exception("LLM rate limit: נסה שוב בעוד דקה")
 
 
-SYSTEM_PROMPT = """You are Israel's top career advisor for high-tech professionals, combining deep expertise in:
-- Israeli tech market dynamics (2024-2025): salaries, demand by role/field, layoff trends, AI impact
-- Career psychology and coaching methodology
-- Technical career paths across all high-tech domains
-- The CORE Blueprint coaching framework
+SYSTEM_PROMPT = """You are Israel's top career advisor for high-tech professionals with deep expertise in:
+- Israeli tech market 2025: exact salary ranges, in-demand roles, layoff patterns, AI disruption by field
+- Career psychology, burnout patterns, career transition methodology
+- All high-tech domains: embedded, firmware, software, product, data, AI/ML, management tracks
 
-You produce brutally honest, highly specific, actionable analysis. You never give generic advice.
-You always respond in valid JSON format exactly as specified. All text fields marked _he should be in Hebrew."""
+CRITICAL OUTPUT RULES — violating these makes your analysis worthless:
+1. NEVER write generic sentences like "המועמד מחזיק בניסיון רב" or "לחפש הזדמנויות". Every sentence must reference specific data from the client's profile (company name, technology, score, quote from their answers).
+2. Role titles in recommended_roles MUST be English LinkedIn-style job titles (e.g. "Embedded Systems Architect", "BLE Technical Lead", "VP Engineering"). Add Hebrew subtitle separately.
+3. 30/60/90 day actions must be concrete tasks (e.g. "Apply to 3 embedded SW architect roles at Rafael/Elbit/IAI", NOT "look for opportunities").
+4. Salary ranges must be realistic Israeli market 2025 (in ILS/month gross).
+5. All _he fields in Hebrew. Respond ONLY with valid JSON."""
 
 
 def analyze_client(questionnaire: dict, client_info: dict) -> dict:
@@ -139,12 +142,17 @@ JSON schema:
     {{"title_he":"","description_he":"","why_good_fit_he":"","fit_score":6,"market_demand":"high","market_demand_reason_he":"","salary_range_ils":"","timeline_he":"","skills_gap_he":[],"bridge_plan_he":"","risk_level":"medium","reward_level":"high","risk_he":"","reward_he":"","plan_30_days_he":[],"plan_60_days_he":[],"plan_90_days_he":[]}}
   ],
   "recommended_roles": [
-    {{"title_he":"","timeframe":"short","reasoning_he":"2-3 sentences why this fits this person","salary_range_ils":"","description_he":""}},
-    {{"title_he":"","timeframe":"short","reasoning_he":"","salary_range_ils":"","description_he":""}},
-    {{"title_he":"","timeframe":"short","reasoning_he":"","salary_range_ils":"","description_he":""}},
-    {{"title_he":"","timeframe":"long","reasoning_he":"","salary_range_ils":"","description_he":""}},
-    {{"title_he":"","timeframe":"long","reasoning_he":"","salary_range_ils":"","description_he":""}}
+    {{"title":"English LinkedIn job title e.g. Senior Embedded SW Engineer","title_he":"כותרת בעברית","timeframe":"short","reasoning_he":"2-3 משפטים ספציפיים מדוע תפקיד זה מתאים לפרופיל הספציפי הזה — ציין טכנולוגיות, חברות, ניסיון רלוונטי","salary_range_ils":"35,000-55,000","description_he":"מה עושים בתפקיד זה בשוק הישראלי"}},
+    {{"title":"English job title","title_he":"","timeframe":"short","reasoning_he":"","salary_range_ils":"","description_he":""}},
+    {{"title":"English job title","title_he":"","timeframe":"short","reasoning_he":"","salary_range_ils":"","description_he":""}},
+    {{"title":"English job title","title_he":"","timeframe":"long","reasoning_he":"","salary_range_ils":"","description_he":""}},
+    {{"title":"English job title","title_he":"","timeframe":"long","reasoning_he":"","salary_range_ils":"","description_he":""}}
   ],
+  "career_roadmap_he": {{
+    "year_1": "מה ריאלי להשיג בשנה הקרובה — כותרת תפקיד ספציפית + צעדים עיקריים",
+    "year_3": "יעד ב-3 שנים — רמה, שכר, מיצוב בשוק",
+    "year_5": "חזון ל-5 שנים — לאן הקריירה יכולה להגיע בתרחיש אופטימלי"
+  }},
   "quick_wins_he": ["win1 this week","win2 in 2 weeks","win3 builds momentum"],
   "networking_he": {{"communities":["c1","c2"],"events":["e1","e2"],"online":["o1","o2"]}},
   "resources": {{
@@ -230,6 +238,7 @@ JSON schema:
         "insights": analysis.get("insights_he", []),
         "recommended_directions": analysis.get("recommended_directions", []),
         "recommended_roles": analysis.get("recommended_roles", []),
+        "career_roadmap": analysis.get("career_roadmap_he", {}),
         "quick_wins": analysis.get("quick_wins_he", []),
         "networking": analysis.get("networking_he", {}),
         "resources": analysis.get("resources", {}),

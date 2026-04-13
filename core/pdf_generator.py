@@ -172,11 +172,13 @@ class ReportPDF(FPDF):
         self.set_xy(186, card_y + card_h / 2 - 6)
         self.cell(13, 12, str(rank), align="C")
 
-        # ── Title ──
+        # ── Title (English title preferred, Hebrew subtitle below) ──
+        eng_title = role.get("title", "")
         self.set_font("Alef", size=13)
         self.set_text_color(*DARK_BLUE)
         self.set_xy(12, card_y + 3)
-        self.cell(168, 9, h(title), align="R")
+        display_title = eng_title if eng_title else h(title)
+        self.cell(168, 9, display_title, align="R")
 
         # ── Timeframe | Salary | Fit score ──
         self.set_font("Alef", size=9)
