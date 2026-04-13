@@ -246,8 +246,15 @@ def get_report(client_id: int) -> dict | None:
     if result.get("report_data"):
         return json.loads(result["report_data"])
     # Fallback for old records
-    result["spider_data"] = json.loads(result["spider_data"]) if result.get("spider_data") else {}
-    result["recommended_directions"] = json.loads(result["recommended_directions"]) if result.get("recommended_directions") else []
-    result["syllabus"] = json.loads(result["syllabus"]) if result.get("syllabus") else []
-    result["insights"] = json.loads(result["insights"]) if result.get("insights") else []
+    def safe_json(val, default):
+        if not val:
+            return default
+        try:
+            return json.loads(val)
+        except Exception:
+            return default
+    result["spider_data"] = safe_json(result.get("spider_data"), {})
+    result["recommended_directions"] = safe_json(result.get("recommended_directions"), [])
+    result["syllabus"] = safe_json(result.get("syllabus"), [])
+    result["insights"] = safe_json(result.get("insights"), [])
     return result
