@@ -37,16 +37,18 @@ Top 3 urgent areas to improve: {part_a.get('top3', [])}
 
 PART B - PROFESSIONAL DIRECTION:
 1. Seniority level: {part_b.get('seniority', 'N/A')}
-2. Current domain: {part_b.get('domain_current', 'N/A')}
-3. Desired domain: {part_b.get('domain_desired', 'N/A')}
-4. IC vs Manager (1=full IC, 10=full Manager): {part_b.get('ic_manager', 'N/A')}
-5. Technical depth importance (1-10): {part_b.get('technical_depth', 'N/A')}
-6. Preferred company stage (1=Startup, 10=Enterprise): {part_b.get('company_stage', 'N/A')}
-7. Market demand feeling (1-10): {part_b.get('market_demand', 'N/A')}
-8. Main concerns: {part_b.get('main_concerns', [])}
-9. Main obstacle to change: {part_b.get('main_obstacle', [])}
-10. Skills to develop: {part_b.get('skills_to_develop', 'N/A')}
-11. Definition of success: {part_b.get('success_definition', 'N/A')}
+2. Current field: {part_b.get('field_current', 'N/A')}
+3. Current role/domain: {part_b.get('role_current', 'N/A')}
+4. Desired field: {part_b.get('field_desired', 'N/A')}
+5. Desired role/domain: {part_b.get('role_desired', 'N/A')}
+6. IC vs Manager (1=full IC, 10=full Manager): {part_b.get('ic_manager', 'N/A')}
+7. Technical depth importance (1-10): {part_b.get('technical_depth', 'N/A')}
+8. Preferred company stage (1=Startup, 10=Enterprise): {part_b.get('company_stage', 'N/A')}
+9. Market demand feeling (1-10): {part_b.get('market_demand', 'N/A')}
+10. Main concerns: {part_b.get('main_concerns', [])}
+11. Main obstacle to change: {part_b.get('main_obstacle', [])}
+12. Skills to develop: {part_b.get('skills_to_develop', 'N/A')}
+13. Definition of success: {part_b.get('success_definition', 'N/A')}
 
 CV TEXT (if provided):
 {cv_text if cv_text else 'No CV provided'}

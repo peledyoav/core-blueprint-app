@@ -28,6 +28,10 @@ LABELS = {
         "invalid_token": "הקישור אינו תקין. פנה/י למנטור שלך.",
         "success": "השאלון נשלח בהצלחה! תודה רבה.",
         "lang_toggle": "English",
+        "field_current": "תחום עיסוק נוכחי",
+        "field_desired": "תחום עיסוק רצוי",
+        "role_current": "תפקיד/דומיין נוכחי",
+        "role_desired": "תפקיד/דומיין רצוי",
     },
     "en": {
         "title": "🧭 CORE Blueprint Questionnaire",
@@ -44,6 +48,10 @@ LABELS = {
         "invalid_token": "Invalid link. Please contact your mentor.",
         "success": "Questionnaire submitted successfully! Thank you.",
         "lang_toggle": "עברית",
+        "field_current": "Current field",
+        "field_desired": "Desired field",
+        "role_current": "Current role / domain",
+        "role_desired": "Desired role / domain",
     }
 }
 
@@ -76,22 +84,76 @@ PART_A_QUESTIONS = {
 
 PART_A_KEYS = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"]
 
-PART_A_SHORT = {
-    "he": ["אתגרי יומיום", "איזון עבודה-חיים", "פיתוח מקצועי", "גמול חומרי",
-           "יחסים בעבודה", "ביטחון תעסוקתי", "תרבות ארגונית", "משמעות ומטרה",
-           "עניין ומימוש עצמי", "השפעה ויוזמה"],
-    "en": ["Daily Challenges", "Work-Life Balance", "Professional Dev.", "Compensation",
-           "Work Relationships", "Employment Security", "Culture", "Meaning & Purpose",
-           "Self-Actualization", "Influence"],
+# General fields
+FIELDS = {
+    "he": [
+        "פיתוח תוכנה (Software)",
+        "חומרה / אלקטרוניקה (Hardware)",
+        "קושחה / מערכות משובצות (Embedded/Firmware)",
+        "IT / תשתיות",
+        "דאטה ואנליטיקה",
+        "בינה מלאכותית / מחקר (AI/ML)",
+        "סייבר ואבטחת מידע",
+        "מוצר ועיצוב (Product/UX)",
+        "פינטק (Fintech)",
+        "ביוטק / מדטק (Biotech/MedTech)",
+        "ביטחון ואווירונאוטיקה (Defense/Aerospace)",
+        "תקשורת וסלקום (Telecom)",
+        "ניהול פרויקטים / תוכניות",
+        "אחר",
+    ],
+    "en": [
+        "Software Development",
+        "Hardware / Electronics",
+        "Embedded / Firmware",
+        "IT / Infrastructure",
+        "Data & Analytics",
+        "AI / ML / Research",
+        "Cybersecurity",
+        "Product & Design (UX)",
+        "Fintech",
+        "Biotech / MedTech",
+        "Defense / Aerospace",
+        "Telecom",
+        "Project / Program Management",
+        "Other",
+    ]
 }
 
-DOMAINS = ["Backend", "Frontend", "Full-Stack", "Data", "AI/ML", "DevOps/Platform",
-           "Product", "Architecture", "Security", "אחר / Other"]
-
-SENIORITY_OPTIONS = {
-    "he": ["Junior", "Mid", "Senior", "Staff / Principal", "Lead / Manager", "Director+"],
-    "en": ["Junior", "Mid", "Senior", "Staff / Principal", "Lead / Manager", "Director+"],
+# Specific roles per field (same index as FIELDS)
+ROLES_BY_FIELD = {
+    "פיתוח תוכנה (Software)": ["Backend", "Frontend", "Full-Stack", "Mobile (iOS/Android)", "QA / Automation", "DevOps / Platform", "Site Reliability (SRE)", "Software Architecture", "אחר / Other"],
+    "חומרה / אלקטרוניקה (Hardware)": ["VLSI / ASIC Design", "PCB Design", "Analog / RF", "Digital Design", "Hardware Verification", "System Engineering", "אחר / Other"],
+    "קושחה / מערכות משובצות (Embedded/Firmware)": ["Firmware Development", "RTOS / BSP", "Drivers", "Embedded Linux", "Real-Time Systems", "אחר / Other"],
+    "IT / תשתיות": ["SysAdmin / IT", "Network Engineering", "Cloud (AWS/Azure/GCP)", "IT Support", "Storage & Backup", "אחר / Other"],
+    "דאטה ואנליטיקה": ["Data Engineering", "Data Science", "BI / Analytics", "Data Architecture", "Database Administration", "אחר / Other"],
+    "בינה מלאכותית / מחקר (AI/ML)": ["ML Engineering", "AI Research", "Computer Vision", "NLP", "MLOps", "Generative AI", "אחר / Other"],
+    "סייבר ואבטחת מידע": ["Penetration Testing / Red Team", "SOC / Blue Team", "AppSec", "Cloud Security", "GRC / Compliance", "אחר / Other"],
+    "מוצר ועיצוב (Product/UX)": ["Product Management", "UX / UI Design", "Product Analytics", "Growth", "אחר / Other"],
+    "פינטק (Fintech)": ["Backend / API", "Payments", "Risk & Compliance", "Blockchain / Web3", "Trading Systems", "אחר / Other"],
+    "ביוטק / מדטק (Biotech/MedTech)": ["Bioinformatics", "Medical Devices Software", "Regulatory Affairs", "Clinical Data", "אחר / Other"],
+    "ביטחון ואווירונאוטיקה (Defense/Aerospace)": ["Systems Engineering", "Avionics", "Simulation", "Signal Processing", "Cyber Defense", "אחר / Other"],
+    "תקשורת וסלקום (Telecom)": ["Network Engineering", "RF / Wireless", "Core Network", "OSS/BSS", "אחר / Other"],
+    "ניהול פרויקטים / תוכניות": ["Project Manager", "Program Manager", "Scrum Master / Agile", "PMO", "אחר / Other"],
+    "אחר": ["אחר / Other"],
+    # English keys
+    "Software Development": ["Backend", "Frontend", "Full-Stack", "Mobile (iOS/Android)", "QA / Automation", "DevOps / Platform", "Site Reliability (SRE)", "Software Architecture", "Other"],
+    "Hardware / Electronics": ["VLSI / ASIC Design", "PCB Design", "Analog / RF", "Digital Design", "Hardware Verification", "System Engineering", "Other"],
+    "Embedded / Firmware": ["Firmware Development", "RTOS / BSP", "Drivers", "Embedded Linux", "Real-Time Systems", "Other"],
+    "IT / Infrastructure": ["SysAdmin / IT", "Network Engineering", "Cloud (AWS/Azure/GCP)", "IT Support", "Storage & Backup", "Other"],
+    "Data & Analytics": ["Data Engineering", "Data Science", "BI / Analytics", "Data Architecture", "Database Administration", "Other"],
+    "AI / ML / Research": ["ML Engineering", "AI Research", "Computer Vision", "NLP", "MLOps", "Generative AI", "Other"],
+    "Cybersecurity": ["Penetration Testing / Red Team", "SOC / Blue Team", "AppSec", "Cloud Security", "GRC / Compliance", "Other"],
+    "Product & Design (UX)": ["Product Management", "UX / UI Design", "Product Analytics", "Growth", "Other"],
+    "Fintech": ["Backend / API", "Payments", "Risk & Compliance", "Blockchain / Web3", "Trading Systems", "Other"],
+    "Biotech / MedTech": ["Bioinformatics", "Medical Devices Software", "Regulatory Affairs", "Clinical Data", "Other"],
+    "Defense / Aerospace": ["Systems Engineering", "Avionics", "Simulation", "Signal Processing", "Cyber Defense", "Other"],
+    "Telecom": ["Network Engineering", "RF / Wireless", "Core Network", "OSS/BSS", "Other"],
+    "Project / Program Management": ["Project Manager", "Program Manager", "Scrum Master / Agile", "PMO", "Other"],
+    "Other": ["Other"],
 }
+
+SENIORITY_OPTIONS = ["Junior", "Mid", "Senior", "Staff / Principal", "Lead / Manager", "Director+"]
 
 CONCERNS = {
     "he": ["השפעת ה-AI על התפקיד שלי", "פיטורים וחוסר יציבות", "תקרת זכוכית",
@@ -123,7 +185,6 @@ def main():
         <style>
         .stApp { direction: rtl; text-align: right; }
         .stSlider { direction: ltr; }
-        .stRadio > div { flex-direction: row-reverse; }
         </style>
         """, unsafe_allow_html=True)
 
@@ -153,6 +214,29 @@ def main():
     st.markdown(f"*{L['subtitle']}*")
     st.divider()
 
+    # --- Dynamic field/role selectors (outside form for reactivity) ---
+    st.subheader(L["part_b_title"])
+    st.caption(L["part_b_desc"])
+
+    fields_list = FIELDS[lang]
+
+    col1, col2 = st.columns(2)
+    with col1:
+        field_current = st.selectbox(L["field_current"], fields_list, key="field_current")
+    with col2:
+        field_desired = st.selectbox(L["field_desired"], fields_list, key="field_desired")
+
+    roles_current = ROLES_BY_FIELD.get(field_current, ["אחר / Other"])
+    roles_desired = ROLES_BY_FIELD.get(field_desired, ["אחר / Other"])
+
+    col3, col4 = st.columns(2)
+    with col3:
+        role_current = st.selectbox(L["role_current"], roles_current, key="role_current")
+    with col4:
+        role_desired = st.selectbox(L["role_desired"], roles_desired, key="role_desired")
+
+    st.divider()
+
     with st.form("questionnaire_form"):
         # --- PART A ---
         st.subheader(L["part_a_title"])
@@ -160,93 +244,54 @@ def main():
 
         part_a = {}
         questions = PART_A_QUESTIONS[lang]
-        for i, (key, question) in enumerate(zip(PART_A_KEYS, questions)):
-            part_a[key] = st.slider(
-                question,
-                min_value=1, max_value=10, value=5,
-                key=f"part_a_{key}"
-            )
+        for key, question in zip(PART_A_KEYS, questions):
+            part_a[key] = st.slider(question, min_value=1, max_value=10, value=5, key=f"pa_{key}")
 
         st.divider()
 
-        # --- PART B ---
-        st.subheader(L["part_b_title"])
-        st.caption(L["part_b_desc"])
-
+        # --- PART B (rest of questions) ---
         part_b = {}
 
         if lang == "he":
-            part_b["seniority"] = st.selectbox("רמת בכירות נוכחית", SENIORITY_OPTIONS[lang])
-            part_b["domain_current"] = st.selectbox("דומיין נוכחי", DOMAINS)
-            part_b["domain_desired"] = st.selectbox("דומיין רצוי", DOMAINS)
+            part_b["seniority"] = st.selectbox("רמת בכירות נוכחית", SENIORITY_OPTIONS)
             part_b["ic_manager"] = st.slider(
-                "IC או Manager? (1 = טכני מלא, 10 = ניהול אנשים מלא)",
-                1, 10, 5
-            )
+                "IC או Manager? (1 = טכני מלא, 10 = ניהול אנשים מלא)", 1, 10, 5)
             part_b["technical_depth"] = st.slider(
-                "כמה חשוב לך להישאר 'בחומר הטכני' ביומיום? (1-10)",
-                1, 10, 5
-            )
+                "כמה חשוב לך להישאר 'בחומר הטכני' ביומיום? (1-10)", 1, 10, 5)
             part_b["company_stage"] = st.slider(
-                "סטייג' חברה מועדף (1 = Startup מוקדם, 10 = Enterprise גדול)",
-                1, 10, 5
-            )
+                "סטייג' חברה מועדף (1 = Startup מוקדם, 10 = Enterprise גדול)", 1, 10, 5)
             part_b["market_demand"] = st.slider(
-                "כמה אתה מרגיש שהכישורים שלך מבוקשים בשוק היום? (1-10)",
-                1, 10, 5
-            )
+                "כמה אתה מרגיש שהכישורים שלך מבוקשים בשוק היום? (1-10)", 1, 10, 5)
             part_b["main_concerns"] = st.multiselect(
                 "מה החשש המרכזי שלך לגבי העתיד המקצועי? (עד 2)",
-                options=CONCERNS[lang], max_selections=2
-            )
+                options=CONCERNS[lang], max_selections=2)
             part_b["main_obstacle"] = st.multiselect(
                 "מה המכשול העיקרי שמונע ממך לעשות את השינוי? (עד 2)",
-                options=OBSTACLES[lang], max_selections=2
-            )
+                options=OBSTACLES[lang], max_selections=2)
             part_b["skills_to_develop"] = st.text_area(
-                "אילו כישורים תרצה לפתח ב-12 חודשים הקרובים? (משפט אחד)",
-                max_chars=300
-            )
+                "אילו כישורים תרצה לפתח ב-12 חודשים הקרובים? (משפט אחד)", max_chars=300)
             part_b["success_definition"] = st.text_area(
-                "מה ייראה לך כהצלחה בסוף התהליך? (משפט אחד)",
-                max_chars=300
-            )
+                "מה ייראה לך כהצלחה בסוף התהליך? (משפט אחד)", max_chars=300)
         else:
-            part_b["seniority"] = st.selectbox("Current seniority level", SENIORITY_OPTIONS[lang])
-            part_b["domain_current"] = st.selectbox("Current domain", DOMAINS)
-            part_b["domain_desired"] = st.selectbox("Desired domain", DOMAINS)
+            part_b["seniority"] = st.selectbox("Current seniority level", SENIORITY_OPTIONS)
             part_b["ic_manager"] = st.slider(
-                "IC or Manager? (1 = fully technical, 10 = people management)",
-                1, 10, 5
-            )
+                "IC or Manager? (1 = fully technical, 10 = people management)", 1, 10, 5)
             part_b["technical_depth"] = st.slider(
-                "How important is staying 'in the technical material' daily? (1-10)",
-                1, 10, 5
-            )
+                "How important is staying 'in the technical material' daily? (1-10)", 1, 10, 5)
             part_b["company_stage"] = st.slider(
-                "Preferred company stage (1 = Early Startup, 10 = Large Enterprise)",
-                1, 10, 5
-            )
+                "Preferred company stage (1 = Early Startup, 10 = Large Enterprise)", 1, 10, 5)
             part_b["market_demand"] = st.slider(
-                "How in-demand do you feel your skills are today? (1-10)",
-                1, 10, 5
-            )
+                "How in-demand do you feel your skills are today? (1-10)", 1, 10, 5)
             part_b["main_concerns"] = st.multiselect(
-                "What are your main concerns about your professional future? (up to 2)",
-                options=CONCERNS[lang], max_selections=2
-            )
+                "Main concerns about your professional future? (up to 2)",
+                options=CONCERNS[lang], max_selections=2)
             part_b["main_obstacle"] = st.multiselect(
-                "What is the main obstacle preventing you from making a change? (up to 2)",
-                options=OBSTACLES[lang], max_selections=2
-            )
+                "Main obstacle preventing you from making a change? (up to 2)",
+                options=OBSTACLES[lang], max_selections=2)
             part_b["skills_to_develop"] = st.text_area(
-                "What skills would you like to develop in the next 12 months? (one sentence)",
-                max_chars=300
-            )
+                "Skills to develop in the next 12 months? (one sentence)", max_chars=300)
             part_b["success_definition"] = st.text_area(
-                "What would success look like at the end of the process? (one sentence)",
-                max_chars=300
-            )
+                "What would success look like at the end of the process? (one sentence)", max_chars=300)
 
         st.divider()
 
@@ -261,6 +306,12 @@ def main():
         submitted = st.form_submit_button(L["submit"], type="primary", use_container_width=True)
 
     if submitted:
+        # Merge field/role from session state into part_b
+        part_b["field_current"] = st.session_state.get("field_current", "")
+        part_b["field_desired"] = st.session_state.get("field_desired", "")
+        part_b["role_current"] = st.session_state.get("role_current", "")
+        part_b["role_desired"] = st.session_state.get("role_desired", "")
+
         cv_text = ""
         if cv_file:
             cv_text = extract_cv_text(cv_file.read(), cv_file.name)
