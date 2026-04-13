@@ -93,6 +93,18 @@ def update_client(client_id: int, name: str, email: str, notes: str = ""):
     conn.close()
 
 
+def reset_client_data(client_id: int):
+    """Delete questionnaire, report and draft - keep client record intact."""
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("DELETE FROM drafts WHERE client_id=%s", (client_id,))
+    c.execute("DELETE FROM reports WHERE client_id=%s", (client_id,))
+    c.execute("DELETE FROM questionnaires WHERE client_id=%s", (client_id,))
+    conn.commit()
+    c.close()
+    conn.close()
+
+
 def delete_client(client_id: int):
     conn = get_connection()
     c = conn.cursor()

@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 sys.path.insert(0, str(Path(__file__).parent))
 
-from core.database import (init_db, add_client, update_client, delete_client,
+from core.database import (init_db, add_client, update_client, delete_client, reset_client_data,
                            get_all_clients, get_client_by_id, get_questionnaire, get_report, save_report)
 from core.analyzer import analyze_client
 from core.charts import create_spider_chart, create_energy_bars
@@ -174,10 +174,23 @@ def page_clients():
                     st.success("עודכן!")
                     st.rerun()
                 st.divider()
-                st.markdown("**מחיקת לקוח:**")
-                confirm = st.checkbox(f"אני מאשר מחיקת {client['name']} וכל הנתונים שלו", key=f"confirm_{client['id']}")
+                st.markdown("**איפוס נתוני שאלון ודוח:**")
+                st.caption("מוחק את השאלון והדוח - הלקוח יוכל למלא מחדש. הפרטים האישיים נשמרים.")
+                confirm_reset = st.checkbox(f"אני מאשר איפוס נתוני {client['name']}", key=f"confirm_reset_{client['id']}")
+                if confirm_reset:
+                    if st.button("🔄 אפס נתונים", key=f"reset_{client['id']}", type="secondary"):
+                        reset_client_data(client["id"])
+                        if st.session_state.get("view_client_id") == client["id"]:
+                            del st.session_state["view_client_id"]
+                        st.success("הנתונים אופסו. הלקוח יכול למלא שאלון מחדש.")
+                        st.rerun()
+
+                st.divider()
+                st.markdown("**מחיקת לקוח מלאה:**")
+                st.caption("מוחק את הלקוח וכל הנתונים שלו לצמיתות.")
+                confirm = st.checkbox(f"אני מאשר מחיקה מלאה של {client['name']}", key=f"confirm_{client['id']}")
                 if confirm:
-                    if st.button("🗑️ מחק לקוח", key=f"delete_{client['id']}", type="secondary"):
+                    if st.button("🗑️ מחק לקוח לצמיתות", key=f"delete_{client['id']}", type="secondary"):
                         delete_client(client["id"])
                         if st.session_state.get("view_client_id") == client["id"]:
                             del st.session_state["view_client_id"]
