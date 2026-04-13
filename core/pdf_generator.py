@@ -111,14 +111,13 @@ class ReportPDF(FPDF):
         self.set_x(15)
         self.multi_cell(180, 6, intro, align="R")
 
-    def section_title(self, title: str, icon: str = ""):
+    def section_title(self, title: str):
         self.ln(6)
         self.set_fill_color(*DARK_BLUE)
         self.set_text_color(*WHITE)
         self.set_font("Alef", size=13)
-        full = h(f"{title}  {icon}") if icon else h(title)
         self.set_x(10)
-        self.cell(190, 10, full, fill=True, align="R")
+        self.cell(190, 10, h(title), fill=True, align="R")
         self.set_text_color(0, 0, 0)
         self.ln(4)
 
@@ -140,50 +139,79 @@ class ReportPDF(FPDF):
         self.set_text_color(0, 0, 0)
 
     def role_card(self, rank: int, role: dict):
-        """Render a single recommended role card."""
-        self.ln(4)
+        """Render a single recommended role card with full detail."""
+        self.ln(3)
         timeframe = role.get("timeframe", "short")
         color = TEAL if timeframe == "short" else DARK_BLUE
-        label = "טווח קצר" if timeframe == "short" else "טווח ארוך"
+        label = "טווח קצר (עד 12 חודשים)" if timeframe == "short" else "טווח ארוך (1–3 שנים)"
+
+        card_y = self.get_y()
+
+        # ── Measure text height first to determine card height ──
+        title = role.get("title_he", "")
+        reasoning = role.get("reasoning_he") or role.get("why_good_fit_he") or role.get("description_he", "")
+        why_desc = role.get("description_he", "") if role.get("reasoning_he") or role.get("why_good_fit_he") else ""
+        skills_gap = role.get("skills_gap_he", [])
+        fit_score = role.get("fit_score")
+        market_demand = role.get("market_demand", "")
+        demand_he = {"high": "גבוהה", "medium": "בינונית", "low": "נמוכה"}.get(market_demand, "")
+
+        # Estimate card height
+        reasoning_lines = max(1, len(reasoning) // 70 + 1)
+        card_h = 14 + 8 + (reasoning_lines * 5) + (6 if why_desc else 0) + (8 if skills_gap else 0) + 4
 
         # Card background
         self.set_fill_color(*LIGHT_GRAY)
-        card_y = self.get_y()
-        card_h = 38
         self.rect(10, card_y, 190, card_h, "F")
 
-        # Rank circle (teal bar on right)
+        # Colored rank bar on right side
         self.set_fill_color(*color)
         self.rect(185, card_y, 15, card_h, "F")
-        self.set_font("Alef", size=16)
+        self.set_font("Alef", size=18)
         self.set_text_color(*WHITE)
-        self.set_xy(186, card_y + card_h / 2 - 5)
-        self.cell(13, 10, str(rank), align="C")
+        self.set_xy(186, card_y + card_h / 2 - 6)
+        self.cell(13, 12, str(rank), align="C")
 
-        # Title
-        self.set_font("Alef", size=12)
+        # ── Title ──
+        self.set_font("Alef", size=13)
         self.set_text_color(*DARK_BLUE)
-        self.set_xy(10, card_y + 4)
-        title = role.get("title_he", "")
-        self.cell(170, 8, h(title), align="R")
+        self.set_xy(12, card_y + 3)
+        self.cell(168, 9, h(title), align="R")
 
-        # Timeframe + salary
+        # ── Timeframe | Salary | Fit score ──
         self.set_font("Alef", size=9)
         self.set_text_color(*color)
-        self.set_xy(10, card_y + 13)
+        self.set_xy(12, card_y + 12)
         salary = role.get("salary_range_ils", "")
-        tag = f"{label}  |  {salary} ₪" if salary else label
-        self.cell(170, 6, h(tag), align="R")
+        parts = [label]
+        if salary:
+            parts.append(f"{salary} ₪")
+        if fit_score:
+            parts.append(f"התאמה: {fit_score}/10")
+        if demand_he:
+            parts.append(f"ביקוש: {demand_he}")
+        self.cell(168, 5, h("  |  ".join(parts)), align="R")
 
-        # Reasoning
+        # ── Reasoning (why this role fits) ──
         self.set_font("Alef", size=9)
         self.set_text_color(*TEXT_GRAY)
-        self.set_xy(10, card_y + 20)
-        reasoning = role.get("reasoning_he", role.get("description_he", ""))
-        # Truncate if too long
-        if len(reasoning) > 160:
-            reasoning = reasoning[:157] + "..."
-        self.multi_cell(170, 5, h(reasoning), align="R")
+        self.set_xy(12, card_y + 19)
+        self.multi_cell(168, 5, h(reasoning), align="R")
+
+        # ── Short description if separate ──
+        if why_desc:
+            self.set_font("Alef", size=8)
+            self.set_text_color(120, 120, 120)
+            self.set_x(12)
+            self.multi_cell(168, 4, h(why_desc), align="R")
+
+        # ── Skills gap ──
+        if skills_gap:
+            self.set_font("Alef", size=8)
+            self.set_text_color(*DARK_BLUE)
+            self.set_x(12)
+            gap_text = "פערים לסגירה: " + " • ".join(str(s) for s in skills_gap[:3])
+            self.cell(168, 5, h(gap_text), align="R")
 
         self.set_y(card_y + card_h + 2)
         self.set_text_color(0, 0, 0)
@@ -201,22 +229,37 @@ def generate_client_pdf(report: dict, client_name: str) -> bytes:
     # ── Executive Summary ─────────────────────────────────────────────────────
     if report.get("executive_summary_he"):
         pdf.add_page()
-        pdf.section_title("סיכום מנהלים", "📋")
+        pdf.section_title("סיכום מנהלים")
         pdf.body_text(report["executive_summary_he"])
 
     # ── 5 Recommended Roles ───────────────────────────────────────────────────
+    # Prefer dedicated recommended_roles; fall back to recommended_directions
     roles = report.get("recommended_roles", [])
+    if not roles:
+        directions = report.get("recommended_directions", [])
+        for i, d in enumerate(directions[:5]):
+            roles.append({
+                "title_he": d.get("title_he", d.get("title", "")),
+                "timeframe": "short" if i < 3 else "long",
+                "reasoning_he": d.get("why_good_fit_he", ""),
+                "description_he": d.get("description_he", ""),
+                "salary_range_ils": d.get("salary_range_ils", ""),
+                "fit_score": d.get("fit_score"),
+                "market_demand": d.get("market_demand", ""),
+                "skills_gap_he": d.get("skills_gap_he", []),
+            })
+
     if roles:
         pdf.add_page()
-        pdf.section_title("5 התפקידים המומלצים עבורך", "🎯")
+        pdf.section_title("התפקידים המומלצים עבורך", "")
         pdf.ln(2)
         pdf.set_font("Alef", size=9)
         pdf.set_text_color(*TEXT_GRAY)
         pdf.set_x(15)
-        pdf.cell(180, 5, h("תפקידים בטווח קצר ניתן להשיג תוך 12 חודשים. תפקידי טווח ארוך דורשים 1-3 שנות התפתחות."), align="R")
+        pdf.cell(180, 5, h("תפקידים בטווח קצר ניתן להשיג תוך 12 חודשים. תפקידי טווח ארוך דורשים 1–3 שנות התפתחות."), align="R")
         pdf.ln(6)
         for i, role in enumerate(roles[:5], 1):
-            if pdf.get_y() > 240:
+            if pdf.get_y() > 230:
                 pdf.add_page()
             pdf.role_card(i, role)
 
@@ -224,7 +267,7 @@ def generate_client_pdf(report: dict, client_name: str) -> bytes:
     insights = report.get("insights", [])
     if insights:
         pdf.add_page()
-        pdf.section_title("תובנות מרכזיות", "🔍")
+        pdf.section_title("תובנות מרכזיות")
         for insight in insights[:4]:
             pdf.bullet(str(insight))
             pdf.ln(1)
@@ -233,7 +276,7 @@ def generate_client_pdf(report: dict, client_name: str) -> bytes:
     quick_wins = report.get("quick_wins", [])
     if quick_wins:
         pdf.ln(4)
-        pdf.section_title("פעולות מיידיות - לעשות השבוע", "⚡")
+        pdf.section_title("פעולות מיידיות - לעשות השבוע")
         for win in quick_wins[:3]:
             pdf.bullet(str(win))
             pdf.ln(1)

@@ -98,7 +98,14 @@ Additional coaching goal: {part_b.get('coaching_specific','N/A')}
 {cv_text if cv_text else "No CV provided - infer from questionnaire data only"}
 
 === INSTRUCTIONS ===
-1. Extract from CV (if provided): exact years of experience, career progression, technical skills, company types/sizes, key projects, salary indicators
+IMPORTANT — YEARS OF EXPERIENCE CALCULATION:
+- Today's date is {date.today().strftime('%Y-%m-%d')}. Use this as the reference point.
+- Calculate total years of experience by finding the EARLIEST start date in the CV work history and computing the difference to TODAY.
+- Do NOT use any number mentioned in the profile/summary text (e.g. "9 years of experience") — those numbers were written at the time the CV was last updated, NOT today.
+- If the CV has an open-ended role (e.g. "September 2014 –" with no end date), assume it continues to today.
+- Example: if earliest role started July 2005 and today is 2026, that is ~21 years total experience.
+
+1. Extract from CV (if provided): exact years of experience (calculated per above), career progression, technical skills, company types/sizes, key projects, salary indicators
 2. If no CV: infer what you can from questionnaire data
 3. Assess: market positioning in Israeli tech market 2025, personal brand strength, competitive advantages
 4. Provide brutally honest, highly specific insights - NOT generic advice
