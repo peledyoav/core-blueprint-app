@@ -1,9 +1,24 @@
 import os
+import re
 import json
 import time
 import requests
 from datetime import date
 from data.core_blueprint import TRACKS
+
+
+def _calc_years_experience(cv_text: str) -> int | None:
+    """Find the earliest plausible year in CV work history and compute experience to today."""
+    if not cv_text:
+        return None
+    current_year = date.today().year
+    # Find all 4-digit years between 1970 and current year
+    years = [int(y) for y in re.findall(r'\b(19[7-9]\d|20[0-2]\d)\b', cv_text)
+             if int(y) <= current_year]
+    if not years:
+        return None
+    earliest = min(years)
+    return current_year - earliest
 
 
 def _get_api_key():
@@ -75,8 +90,14 @@ def analyze_client(questionnaire: dict, client_info: dict) -> dict:
     # Cap CV text to avoid blowing token budget
     cv_snippet = (cv_text[:3000] + "\n[truncated]") if len(cv_text) > 3000 else (cv_text or "No CV provided")
 
+    # Pre-compute years of experience from CV dates (overrides LLM guessing)
+    computed_yrs = _calc_years_experience(cv_text)
+    yrs_note = (f"VERIFIED years_total_experience={computed_yrs} (computed from earliest date in CV to today — use this exact number, ignore any years mentioned in profile text)"
+                if computed_yrs else "Calculate years_total_experience from earliest date in CV to today, do NOT use numbers mentioned in profile text")
+
     prompt = f"""Career analysis for Israeli high-tech professional. Respond ONLY with valid JSON, no markdown.
 Today: {date.today().strftime('%Y-%m-%d')}
+{yrs_note}
 
 CLIENT: {client_info['name']}
 SCORES (1-10): challenges={part_a.get('q1','?')} balance={part_a.get('q2','?')} development={part_a.get('q3','?')} compensation={part_a.get('q4','?')} relationships={part_a.get('q5','?')} security={part_a.get('q6','?')} culture={part_a.get('q7','?')} meaning={part_a.get('q8','?')} actualization={part_a.get('q9','?')} influence={part_a.get('q10','?')}
@@ -86,8 +107,6 @@ GOALS: achievement={part_b.get('key_achievement','?')} concerns={part_b.get('mai
 CV: {cv_snippet}
 
 RULES:
-- years_total_experience: calculate from EARLIEST date in CV to TODAY ({date.today().year}), ignore any number mentioned in profile text
-- Open-ended roles (e.g. "2014 –") count through today
 - All _he fields in Hebrew; be specific and personal, never generic
 - recommended_directions: provide exactly 3, each with full 30/60/90 plan
 - recommended_roles: 5 roles (first 3 timeframe="short" achievable <12mo, last 2 timeframe="long" 1-3yr)
@@ -100,7 +119,7 @@ JSON schema:
   "track_reason_he": "2-3 sentences",
   "executive_summary_he": "4-5 specific sentences",
   "spider_data": {{"daily_challenges":{part_a.get('q1',5)},"work_life_balance":{part_a.get('q2',5)},"professional_development":{part_a.get('q3',5)},"compensation":{part_a.get('q4',5)},"relationships":{part_a.get('q5',5)},"security":{part_a.get('q6',5)},"culture":{part_a.get('q7',5)},"meaning":{part_a.get('q8',5)},"self_actualization":{part_a.get('q9',5)},"influence":{part_a.get('q10',5)}}},
-  "cv_profile": {{"years_total_experience":0,"career_stage_he":"","key_technical_skills":[],"key_soft_skills":[],"companies_profile_he":"","career_trajectory_he":"","personal_brand_he":"","brand_gaps_he":"","market_positioning_he":""}},
+  "cv_profile": {{"years_total_experience":{computed_yrs if computed_yrs else "null"},"career_stage_he":"","key_technical_skills":[],"key_soft_skills":[],"companies_profile_he":"","career_trajectory_he":"","personal_brand_he":"","brand_gaps_he":"","market_positioning_he":""}},
   "energy_batteries": {{"connection":5,"progress":5,"influence":5}},
   "swot": {{"strengths_he":["s1","s2","s3","s4"],"weaknesses_he":["w1","w2","w3"],"opportunities_he":["o1","o2","o3"],"threats_he":["t1","t2","t3"]}},
   "market_analysis_he": "3-4 sentences",
