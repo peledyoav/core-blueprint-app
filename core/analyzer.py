@@ -6,31 +6,38 @@ from data.core_blueprint import TRACKS
 def _get_api_key():
     try:
         import streamlit as st
-        return st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
+        return st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
     except Exception:
-        return os.getenv("GOOGLE_API_KEY")
+        return os.getenv("GROQ_API_KEY")
 
 
-def _call_gemini(prompt: str) -> str:
+def _call_llm(prompt: str) -> str:
     api_key = _get_api_key()
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={api_key}"
-    payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"maxOutputTokens": 4000, "temperature": 0.7}
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
     }
-    resp = requests.post(url, json=payload, timeout=120)
+    payload = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": prompt}
+        ],
+        "max_tokens": 4000,
+        "temperature": 0.7
+    }
+    resp = requests.post(url, headers=headers, json=payload, timeout=120)
     if not resp.ok:
         try:
             err = resp.json()
-            msg = err.get("error", {}).get("message", resp.text[:200])
-            code = err.get("error", {}).get("code", resp.status_code)
+            msg = err.get("error", {}).get("message", resp.text[:300])
         except Exception:
-            msg = "unknown"
-            code = resp.status_code
+            msg = resp.text[:300]
         import streamlit as st
-        st.error(f"Gemini error {code}: {msg}")
-        raise Exception(f"Gemini error {code}")
-    return resp.json()["candidates"][0]["content"]["parts"][0]["text"]
+        st.error(f"LLM error {resp.status_code}: {msg}")
+        raise Exception(f"LLM error {resp.status_code}")
+    return resp.json()["choices"][0]["message"]["content"]
 
 SYSTEM_PROMPT = """You are an expert career coach assistant specializing in high-tech professionals in Israel.
 You help analyze career questionnaires and CVs to generate personalized coaching insights and session syllabi based on the CORE Blueprint methodology.
@@ -140,7 +147,7 @@ Based on this data, provide a comprehensive analysis in the following JSON struc
 
 Return ONLY valid JSON, no markdown, no code blocks."""
 
-    raw = _call_gemini(prompt).strip()
+    raw = _call_llm(prompt).strip()
     if raw.startswith("```"):
         raw = raw.split("```")[1]
         if raw.startswith("json"):
