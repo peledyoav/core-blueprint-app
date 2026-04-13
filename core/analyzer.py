@@ -3,7 +3,14 @@ import json
 import google.generativeai as genai
 from data.core_blueprint import TRACKS
 
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
+def _get_google_key():
+    try:
+        import streamlit as st
+        return st.secrets.get("GOOGLE_API_KEY") or os.getenv("GOOGLE_API_KEY")
+    except Exception:
+        return os.getenv("GOOGLE_API_KEY")
+
+genai.configure(api_key=_get_google_key())
 model = genai.GenerativeModel("gemini-1.5-flash")
 
 SYSTEM_PROMPT = """You are an expert career coach assistant specializing in high-tech professionals in Israel.

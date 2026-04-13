@@ -3,11 +3,16 @@ import psycopg2.extras
 import json
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL")
+def _get_db_url():
+    try:
+        import streamlit as st
+        return st.secrets.get("DATABASE_URL") or os.getenv("DATABASE_URL")
+    except Exception:
+        return os.getenv("DATABASE_URL")
 
 
 def get_connection():
-    conn = psycopg2.connect(DATABASE_URL)
+    conn = psycopg2.connect(_get_db_url())
     return conn
 
 
