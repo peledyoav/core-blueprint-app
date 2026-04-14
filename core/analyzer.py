@@ -43,32 +43,38 @@ def _calc_years_experience(cv_text: str) -> int | None:
     return current_year - earliest
 
 
-def _get_api_key():
+def _get_gemini_key():
+    try:
+        import streamlit as st
+        key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+    except Exception:
+        key = os.getenv("GEMINI_API_KEY")
+    return key
+
+
+def _get_groq_key():
     try:
         import streamlit as st
         key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
     except Exception:
         key = os.getenv("GROQ_API_KEY")
-    if not key:
-        raise Exception("GROQ_API_KEY not set in secrets")
     return key
 
 
-MODELS = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]
-
-
 def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
-    api_key = _get_api_key()
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": prompt},
+    ]
 
-    for model in MODELS:
+    # ── Primary: Gemini 2.0 Flash (1M TPM, free) ──────────────────────────────
+    gemini_key = _get_gemini_key()
+    if gemini_key:
+        url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+        headers = {"Authorization": f"Bearer {gemini_key}", "Content-Type": "application/json"}
         payload = {
-            "model": model,
-            "messages": [
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": prompt}
-            ],
+            "model": "gemini-2.0-flash",
+            "messages": messages,
             "max_tokens": max_tokens,
             "temperature": 0.7,
             "response_format": {"type": "json_object"},
@@ -76,16 +82,45 @@ def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
         for attempt in range(2):
             try:
                 resp = requests.post(url, headers=headers, json=payload, timeout=180)
-            except requests.exceptions.Timeout:
+            except requests.exceptions.RequestException as e:
                 if attempt == 0:
-                    time.sleep(5)
+                    time.sleep(3)
                     continue
-                raise Exception("LLM request timed out — נסה שוב")
+                raise Exception(f"Gemini connection error: {e}")
+            if resp.ok:
+                return resp.json()["choices"][0]["message"]["content"]
+            if resp.status_code == 429:
+                time.sleep(10)
+                continue
+            try:
+                msg = resp.json().get("error", {}).get("message", resp.text[:300])
+            except Exception:
+                msg = resp.text[:300]
+            raise Exception(f"Gemini error {resp.status_code}: {msg}")
+
+    # ── Fallback: Groq (rate-limited but available) ────────────────────────────
+    groq_key = _get_groq_key()
+    if not groq_key:
+        raise Exception("No LLM API key configured (GEMINI_API_KEY or GROQ_API_KEY)")
+
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"}
+    for model in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
+        payload = {
+            "model": model,
+            "messages": messages,
+            "max_tokens": max_tokens,
+            "temperature": 0.7,
+            "response_format": {"type": "json_object"},
+        }
+        for attempt in range(2):
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=180)
             except requests.exceptions.RequestException as e:
                 if attempt == 0:
                     time.sleep(5)
                     continue
-                raise Exception(f"LLM connection error: {e}")
+                raise Exception(f"Groq connection error: {e}")
             if resp.ok:
                 return resp.json()["choices"][0]["message"]["content"]
             if resp.status_code == 429:
@@ -96,21 +131,18 @@ def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
                 wait = min(wait + 3, 70)
                 try:
                     import streamlit as st
-                    label = "70b" if "70b" in model else "8b"
-                    st.info(f"מגבלת קצב ({label}) — ממתין {int(wait)} שניות...")
+                    st.info(f"מגבלת קצב Groq — ממתין {int(wait)} שניות...")
                 except Exception:
                     pass
                 time.sleep(wait)
                 continue
-            # Non-rate-limit error — break out of retry loop
             try:
                 msg = resp.json().get("error", {}).get("message", resp.text[:300])
             except Exception:
                 msg = resp.text[:300]
-            raise Exception(f"LLM error {resp.status_code}: {msg}")
-        # Both attempts with this model failed — try next model
+            raise Exception(f"Groq error {resp.status_code}: {msg}")
 
-    raise Exception("LLM rate limit על שני המודלים — נסה שוב בעוד דקה")
+    raise Exception("כל המודלים מוגבלי קצב — נסה שוב בעוד דקה")
 
 
 SYSTEM_PROMPT = """You are Israel's top career advisor for high-tech professionals with deep expertise in:
