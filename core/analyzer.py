@@ -46,19 +46,31 @@ def _calc_years_experience(cv_text: str) -> int | None:
 def _get_gemini_key():
     try:
         import streamlit as st
-        key = st.secrets.get("GEMINI_API_KEY") or os.getenv("GEMINI_API_KEY")
+        try:
+            return st.secrets["GEMINI_API_KEY"]
+        except (KeyError, Exception):
+            pass
+        key = st.secrets.get("GEMINI_API_KEY")
+        if key:
+            return key
     except Exception:
-        key = os.getenv("GEMINI_API_KEY")
-    return key
+        pass
+    return os.getenv("GEMINI_API_KEY")
 
 
 def _get_groq_key():
     try:
         import streamlit as st
-        key = st.secrets.get("GROQ_API_KEY") or os.getenv("GROQ_API_KEY")
+        try:
+            return st.secrets["GROQ_API_KEY"]
+        except (KeyError, Exception):
+            pass
+        key = st.secrets.get("GROQ_API_KEY")
+        if key:
+            return key
     except Exception:
-        key = os.getenv("GROQ_API_KEY")
-    return key
+        pass
+    return os.getenv("GROQ_API_KEY")
 
 
 def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
