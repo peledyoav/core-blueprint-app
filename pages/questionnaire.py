@@ -247,6 +247,7 @@ def collect_draft_data(lang):
         "main_concerns": concerns,
         "main_obstacle": obstacles,
         "skills_to_develop": st.session_state.get("pb_skills_to_develop",""),
+        "trigger_event": st.session_state.get("pb_trigger_event",""),
         "success_definition": st.session_state.get("pb_success_definition",""),
         "coaching_specific": st.session_state.get("pb_coaching_specific",""),
     }
@@ -300,7 +301,7 @@ def main():
             for k in ["direction_preference","ic_manager_goal","company_stage","energy_givers",
                       "energy_drainers","risk_tolerance","geo_flexibility","learning_hours",
                       "salary_range","key_achievement","main_concerns","main_obstacle",
-                      "skills_to_develop","success_definition","coaching_specific"]:
+                      "skills_to_develop","trigger_event","success_definition","coaching_specific"]:
                 if k in pb:
                     st.session_state[f"pb_{k}"] = pb[k]
             for k in ["field_desired","role_desired"]:
@@ -426,6 +427,11 @@ def main():
         part_b["skills_to_develop"] = st.text_area(
             "אילו כישורים תרצה/י לפתח ב-12 חודשים הקרובים?" if is_he else "Skills to develop in the next 12 months?",
             max_chars=300, key="pb_skills_to_develop")
+
+        part_b["trigger_event"] = st.text_area(
+            "מה קרה לאחרונה שגרם לך לפנות לתהליך הזה עכשיו?" if is_he else "What recently happened that led you to start this process now?",
+            max_chars=400, height=100, key="pb_trigger_event",
+            placeholder="לדוגמה: פוטרתי לפני 3 חודשים, קיבלתי עוד פידבק שלילי מהמנהל, הרגשתי שאני הולך לעבודה בלי מוטיבציה כבר שנה, חבר קיבל תפקיד שנראה לי מושלם...")
 
         part_b["success_definition"] = st.text_area(
             "איך ייראה עבורך הצלחה בסוף התהליך?" if is_he else "What would success look like at the end of the process?",

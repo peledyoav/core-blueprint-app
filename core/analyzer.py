@@ -148,6 +148,7 @@ CLIENT: {client_info['name']}
 SCORES (1-10): challenges={part_a.get('q1','?')} balance={part_a.get('q2','?')} development={part_a.get('q3','?')} compensation={part_a.get('q4','?')} relationships={part_a.get('q5','?')} security={part_a.get('q6','?')} culture={part_a.get('q7','?')} meaning={part_a.get('q8','?')} actualization={part_a.get('q9','?')} influence={part_a.get('q10','?')}
 DESIRED: field={part_b.get('field_desired','?')} role={part_b.get('role_desired','?')} direction={part_b.get('direction_preference','?')} ic_manager={part_b.get('ic_manager_goal','?')} company_stage={part_b.get('company_stage','?')} risk={part_b.get('risk_tolerance','?')} geo={part_b.get('geo_flexibility','?')} learning_hrs={part_b.get('learning_hours','?')} salary={part_b.get('salary_range','?')}
 ENERGY: givers={part_b.get('energy_givers','?')} drainers={part_b.get('energy_drainers','?')}
+TRIGGER (why now): {part_b.get('trigger_event','?')}
 GOALS: achievement={part_b.get('key_achievement','?')} concerns={part_b.get('main_concerns',[])} obstacles={part_b.get('main_obstacle',[])} skills_wanted={part_b.get('skills_to_develop','?')} success={part_b.get('success_definition','?')} coaching_goal={part_b.get('coaching_specific','?')}
 CV: {cv_snippet}
 
