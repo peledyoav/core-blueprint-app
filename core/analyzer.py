@@ -43,34 +43,40 @@ def _calc_years_experience(cv_text: str) -> int | None:
     return current_year - earliest
 
 
-def _get_gemini_key():
+def _get_secret(name: str) -> str | None:
+    """Read a secret from st.secrets or env vars, with detailed logging."""
+    import sys
+    # Try st.secrets
     try:
         import streamlit as st
         try:
-            return st.secrets["GEMINI_API_KEY"]
-        except (KeyError, Exception):
-            pass
-        key = st.secrets.get("GEMINI_API_KEY")
-        if key:
-            return key
-    except Exception:
-        pass
-    return os.getenv("GEMINI_API_KEY")
+            val = st.secrets[name]
+            print(f"[secrets] {name}: found via bracket access (len={len(val)})", file=sys.stderr)
+            return val
+        except KeyError:
+            print(f"[secrets] {name}: KeyError from bracket access", file=sys.stderr)
+        except Exception as e:
+            print(f"[secrets] {name}: exception from bracket access: {type(e).__name__}: {e}", file=sys.stderr)
+        try:
+            val = st.secrets.get(name)
+            print(f"[secrets] {name}: .get() returned {'value' if val else 'None'}", file=sys.stderr)
+            return val
+        except Exception as e:
+            print(f"[secrets] {name}: exception from .get(): {type(e).__name__}: {e}", file=sys.stderr)
+    except Exception as e:
+        print(f"[secrets] failed to import streamlit: {e}", file=sys.stderr)
+    # Try env var
+    val = os.getenv(name)
+    print(f"[secrets] {name}: env var returned {'value' if val else 'None'}", file=sys.stderr)
+    return val
+
+
+def _get_gemini_key():
+    return _get_secret("GEMINI_API_KEY")
 
 
 def _get_groq_key():
-    try:
-        import streamlit as st
-        try:
-            return st.secrets["GROQ_API_KEY"]
-        except (KeyError, Exception):
-            pass
-        key = st.secrets.get("GROQ_API_KEY")
-        if key:
-            return key
-    except Exception:
-        pass
-    return os.getenv("GROQ_API_KEY")
+    return _get_secret("GROQ_API_KEY")
 
 
 def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
