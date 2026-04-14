@@ -208,8 +208,8 @@ GEO_OPTIONS = {
     "en": ["Fully flexible (including relocation)","Israel only - flexible","Specific area in Israel","Remote only"],
 }
 SALARY_OPTIONS = {
-    "he": ["עד 20,000","20,000-30,000","30,000-40,000","40,000-55,000","55,000-70,000","70,000+","לא רלוונטי"],
-    "en": ["Up to 20K ILS","20K-30K ILS","30K-40K ILS","40K-55K ILS","55K-70K ILS","70K+ ILS","Not relevant"],
+    "he": ["עד 25,000","25,000–35,000","35,000–45,000","45,000–60,000","60,000–80,000","80,000–100,000","מעל 100,000"],
+    "en": ["Up to 25K ILS","25K–35K ILS","35K–45K ILS","45K–60K ILS","60K–80K ILS","80K–100K ILS","Above 100K ILS"],
 }
 IC_MANAGER_OPTIONS = {
     "he": ["IC מלא - עומק טכני","IC בכיר עם השפעה","Tech Lead / Architect","Engineering Manager","Director ומעלה","עדיין לא יודע"],
