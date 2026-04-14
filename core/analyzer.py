@@ -113,7 +113,16 @@ def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
     # ── Fallback: Groq (rate-limited but available) ────────────────────────────
     groq_key = _get_groq_key()
     if not groq_key:
-        raise Exception("No LLM API key configured (GEMINI_API_KEY or GROQ_API_KEY)")
+        # Diagnostic: show which secrets keys are actually visible
+        try:
+            import streamlit as st
+            available = list(st.secrets.keys()) if hasattr(st.secrets, "keys") else "unknown"
+        except Exception as _e:
+            available = f"error reading secrets: {_e}"
+        raise Exception(
+            f"No LLM API key configured. "
+            f"Available secret keys: {available}"
+        )
 
     url = "https://api.groq.com/openai/v1/chat/completions"
     headers = {"Authorization": f"Bearer {groq_key}", "Content-Type": "application/json"}
