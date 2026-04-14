@@ -156,9 +156,14 @@ class ReportPDF(FPDF):
         market_demand = role.get("market_demand", "")
         demand_he = {"high": "גבוהה", "medium": "בינונית", "low": "נמוכה"}.get(market_demand, "")
 
-        # Estimate card height
-        reasoning_lines = max(1, len(reasoning) // 70 + 1)
-        card_h = 14 + 8 + (reasoning_lines * 5) + (6 if why_desc else 0) + (8 if skills_gap else 0) + 4
+        # Estimate card height (Hebrew chars are wider, use generous formula)
+        reasoning_lines = max(2, len(reasoning) // 45 + 2)
+        card_h = 18 + 10 + (reasoning_lines * 6) + (8 if why_desc else 0) + (10 if skills_gap else 0) + 6
+
+        # Page break check before drawing
+        if card_y + card_h > 270:
+            self.add_page()
+            card_y = self.get_y()
 
         # Card background
         self.set_fill_color(*LIGHT_GRAY)
