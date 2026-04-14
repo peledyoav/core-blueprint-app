@@ -8,15 +8,37 @@ from data.core_blueprint import TRACKS
 
 
 def _calc_years_experience(cv_text: str) -> int | None:
-    """Find the earliest plausible year in CV work history and compute experience to today."""
+    """Find the earliest professional work year in CV and compute experience to today.
+    Excludes military service and education years."""
     if not cv_text:
         return None
     current_year = date.today().year
-    # Find all 4-digit years between 1970 and current year
-    years = [int(y) for y in re.findall(r'\b(19[7-9]\d|20[0-2]\d)\b', cv_text)
+
+    # Try to isolate the Experience section
+    experience_section = None
+    for keyword in ["Experience", "EXPERIENCE", "ניסיון", "עבודה", "Employment"]:
+        idx = cv_text.find(keyword)
+        if idx != -1:
+            # Take text from this keyword onward (skip education/military preamble)
+            experience_section = cv_text[idx:]
+            break
+
+    search_text = experience_section if experience_section else cv_text
+
+    # Extract all plausible years from the section
+    years = [int(y) for y in re.findall(r'\b(19[7-9]\d|20[0-2]\d)\b', search_text)
              if int(y) <= current_year]
+
     if not years:
         return None
+
+    # If section detection failed, filter out pre-2003 years
+    # (covers typical Israeli military/education period)
+    if experience_section is None:
+        years = [y for y in years if y >= 2003]
+        if not years:
+            return None
+
     earliest = min(years)
     return current_year - earliest
 
@@ -104,8 +126,8 @@ def analyze_client(questionnaire: dict, client_info: dict) -> dict:
 
     # Pre-compute years of experience from CV dates (overrides LLM guessing)
     computed_yrs = _calc_years_experience(cv_text)
-    yrs_note = (f"VERIFIED years_total_experience={computed_yrs} (computed from earliest date in CV to today — use this exact number, ignore any years mentioned in profile text)"
-                if computed_yrs else "Calculate years_total_experience from earliest date in CV to today, do NOT use numbers mentioned in profile text")
+    yrs_note = (f"VERIFIED years_of_work_experience={computed_yrs} — this counts only professional work experience, NOT military service or education"
+                if computed_yrs else "Calculate years_total_experience from earliest professional role in CV to today, exclude military service and education")
 
     prompt = f"""Career analysis for Israeli high-tech professional. Respond ONLY with valid JSON, no markdown.
 Today: {date.today().strftime('%Y-%m-%d')}
