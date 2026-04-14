@@ -370,11 +370,13 @@ def main():
         st.markdown("**⚡ " + ("מקורות אנרגיה ושחיקה" if is_he else "Energy & Burnout Sources") + "**")
         part_b["energy_givers"] = st.text_area(
             "מה מעניק לך אנרגיה ומוטיבציה בעבודה? (משימות, אינטראקציות, סוג עבודה)" if is_he else "What gives you energy and motivation at work? (tasks, interactions, type of work)",
-            max_chars=400, key="pb_energy_givers", placeholder="למשל: פתרון בעיות טכניות מורכבות, עבודה עם לקוחות, הדרכת עמיתים...")
+            max_chars=400, height=120, key="pb_energy_givers",
+            placeholder="לדוגמה: פתרון בעיות טכניות מורכבות, שיחות עם לקוחות שרואים ערך, רגעים שבהם אני מרגיש שאני מלמד מישהו משהו חדש")
 
         part_b["energy_drainers"] = st.text_area(
             "מה גורם לך לשחיקה ומרוקן אותך?" if is_he else "What causes burnout and drains you?",
-            max_chars=400, key="pb_energy_drainers", placeholder="למשל: ישיבות רבות מדי, חוסר אוטונומיה, חזרתיות...")
+            max_chars=400, height=120, key="pb_energy_drainers",
+            placeholder="לדוגמה: ישיבות status שאפשר להיות אימייל, תהליכים בירוקרטיים שמאטים אותי, עבודה על משימות שאני יודע שאף אחד לא ישתמש בהן")
 
         st.divider()
 
@@ -402,7 +404,8 @@ def main():
         st.markdown("**🏆 " + ("הישגים ואתגרים" if is_he else "Achievements & Challenges") + "**")
         part_b["key_achievement"] = st.text_area(
             "מה ההישג המקצועי שאת/ה הכי גאה/ה בו? למה?" if is_he else "What professional achievement are you most proud of? Why?",
-            max_chars=500, key="pb_key_achievement", placeholder="ספר/י על פרויקט, החלטה, או רגע בקריירה שמייצג אותך בצורה הטובה ביותר...")
+            max_chars=500, height=120, key="pb_key_achievement",
+            placeholder="לדוגמה: הובלתי צוות של 5 אנשים לפיתוח מוצר חדש תוך 6 חודשים, בתקציב מצומצם. זה לימד אותי ש...")
 
         concerns_raw = st.multiselect(
             "החששות המרכזיים לגבי העתיד המקצועי (עד 2)" if is_he else "Main concerns about your professional future (up to 2)",
@@ -426,11 +429,13 @@ def main():
 
         part_b["success_definition"] = st.text_area(
             "איך ייראה עבורך הצלחה בסוף התהליך?" if is_he else "What would success look like at the end of the process?",
-            max_chars=300, key="pb_success_definition")
+            max_chars=300, height=120, key="pb_success_definition",
+            placeholder="לדוגמה: בסוף התהליך אני רוצה לדעת בדיוק לאיזה תפקיד להגיש, ולהרגיש שיש לי תוכנית פעולה ריאלית")
 
         part_b["coaching_specific"] = st.text_area(
             "מה הכי חשוב לך לקבל מהתהליך איתי? מה לא נאמר בשאלון?" if is_he else "What's most important to get from this coaching process? What wasn't covered in the questionnaire?",
-            max_chars=400, key="pb_coaching_specific", placeholder="כל מה שחשוב לך שאני אדע...")
+            max_chars=400, height=120, key="pb_coaching_specific",
+            placeholder="כל מה שחשוב לך שיואב ידע — דברים שקשה לכמת בשאלון, חששות, הקשרים משפחתיים, אילוצים שמשפיעים על ההחלטות שלך")
 
         submitted = st.form_submit_button(L["submit"], type="primary", use_container_width=True)
 
