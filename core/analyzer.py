@@ -49,6 +49,7 @@ def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
             ],
             "max_tokens": max_tokens,
             "temperature": 0.7,
+            "response_format": {"type": "json_object"},
         }
         for attempt in range(2):
             resp = requests.post(url, headers=headers, json=payload, timeout=180)
