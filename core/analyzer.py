@@ -90,7 +90,8 @@ CRITICAL OUTPUT RULES — violating these makes your analysis worthless:
 2. Role titles in recommended_roles MUST be English LinkedIn-style job titles (e.g. "Embedded Systems Architect", "BLE Technical Lead", "VP Engineering"). Add Hebrew subtitle separately.
 3. 30/60/90 day actions must be concrete tasks (e.g. "Apply to 3 embedded SW architect roles at Rafael/Elbit/IAI", NOT "look for opportunities").
 4. Salary ranges must be realistic Israeli market 2025 (in ILS/month gross).
-5. All _he fields in Hebrew. Respond ONLY with valid JSON."""
+5. All _he fields in Hebrew. Respond ONLY with valid JSON.
+6. FORBIDDEN phrases in recommended_roles: "[name] הוא/היא מנהל/ת מוכשר/ת", "ניהול X בחברות טכנולוגיה מובילות". Instead write WHY this specific person fits: reference their actual companies (Apple/TI/Samsung), their specific technologies (BLE, embedded FW, Cortex M4), their scores, their stated goals."""
 
 
 def analyze_client(questionnaire: dict, client_info: dict) -> dict:
@@ -150,7 +151,7 @@ JSON schema:
     {{"title_he":"","description_he":"","why_good_fit_he":"","fit_score":6,"market_demand":"high","market_demand_reason_he":"","salary_range_ils":"","timeline_he":"","skills_gap_he":[],"bridge_plan_he":"","risk_level":"medium","reward_level":"high","risk_he":"","reward_he":"","plan_30_days_he":[],"plan_60_days_he":[],"plan_90_days_he":[]}}
   ],
   "recommended_roles": [
-    {{"title":"English LinkedIn job title e.g. Senior Embedded SW Engineer","title_he":"כותרת בעברית","timeframe":"short","reasoning_he":"2-3 משפטים ספציפיים מדוע תפקיד זה מתאים לפרופיל הספציפי הזה — ציין טכנולוגיות, חברות, ניסיון רלוונטי","salary_range_ils":"35,000-55,000","description_he":"מה עושים בתפקיד זה בשוק הישראלי"}},
+    {{"title":"English LinkedIn job title e.g. Senior Embedded SW Engineer","title_he":"כותרת בעברית","timeframe":"short","reasoning_he":"explain fit using client's actual CV data — mention specific companies (e.g. Apple, TI), technologies (e.g. BLE, Cortex M4), years of experience, and their stated goals/scores","salary_range_ils":"35,000-55,000","description_he":"מה עושים בתפקיד זה בשוק הישראלי"}},
     {{"title":"English job title","title_he":"","timeframe":"short","reasoning_he":"","salary_range_ils":"","description_he":""}},
     {{"title":"English job title","title_he":"","timeframe":"short","reasoning_he":"","salary_range_ils":"","description_he":""}},
     {{"title":"English job title","title_he":"","timeframe":"long","reasoning_he":"","salary_range_ils":"","description_he":""}},
