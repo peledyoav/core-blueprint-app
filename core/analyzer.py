@@ -74,7 +74,18 @@ def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
             "response_format": {"type": "json_object"},
         }
         for attempt in range(2):
-            resp = requests.post(url, headers=headers, json=payload, timeout=180)
+            try:
+                resp = requests.post(url, headers=headers, json=payload, timeout=180)
+            except requests.exceptions.Timeout:
+                if attempt == 0:
+                    time.sleep(5)
+                    continue
+                raise Exception("LLM request timed out — נסה שוב")
+            except requests.exceptions.RequestException as e:
+                if attempt == 0:
+                    time.sleep(5)
+                    continue
+                raise Exception(f"LLM connection error: {e}")
             if resp.ok:
                 return resp.json()["choices"][0]["message"]["content"]
             if resp.status_code == 429:
@@ -97,7 +108,7 @@ def _call_llm(prompt: str, max_tokens: int = 5000) -> str:
             except Exception:
                 msg = resp.text[:300]
             raise Exception(f"LLM error {resp.status_code}: {msg}")
-        # Both attempts with this model failed due to rate limit — try next model
+        # Both attempts with this model failed — try next model
 
     raise Exception("LLM rate limit על שני המודלים — נסה שוב בעוד דקה")
 
