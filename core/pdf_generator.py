@@ -271,7 +271,7 @@ def generate_client_pdf(report: dict, client_name: str) -> bytes:
             pdf.role_card(i, role)
 
     # ── Key Insights ──────────────────────────────────────────────────────────
-    insights = report.get("insights", [])
+    insights = report.get("insights_he") or report.get("insights", [])
     if insights:
         pdf.add_page()
         pdf.section_title("תובנות מרכזיות")
@@ -280,7 +280,7 @@ def generate_client_pdf(report: dict, client_name: str) -> bytes:
             pdf.ln(1)
 
     # ── Quick Wins ────────────────────────────────────────────────────────────
-    quick_wins = report.get("quick_wins", [])
+    quick_wins = report.get("quick_wins_he") or report.get("quick_wins", [])
     if quick_wins:
         pdf.ln(4)
         pdf.section_title("פעולות מיידיות - לעשות השבוע")
